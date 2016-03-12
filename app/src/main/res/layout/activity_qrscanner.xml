@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <eu.livotov.labs.android.camview.ScannerLiveView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/qrscanner_camera">
+
+    </eu.livotov.labs.android.camview.ScannerLiveView>
+    
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:layout_width="60dp"
+        app:mlpb_enable_circle_background="false"
+        android:id="@+id/qrscanner_progressbar"
+        android:layout_centerInParent="true"
+        android:layout_height="60dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Scan the QR code"
+        android:id="@+id/textView2"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:layout_centerHorizontal="true" />
+
+    <!--<TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Network error or incorrect QR code, please try again !"
+        android:id="@+id/textViewz"
+        android:gravity="center"
+        android:layout_below="@+id/textView2"
+        android:layout_marginTop="10dp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:layout_centerHorizontal="true" />-->
+</RelativeLayout>

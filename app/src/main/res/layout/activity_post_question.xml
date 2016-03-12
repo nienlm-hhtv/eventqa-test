@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorAccent"
+    android:paddingTop="32dp"
+    android:paddingLeft="@dimen/item_padding_large"
+    android:paddingRight="@dimen/item_padding_large"
+    android:paddingBottom="@dimen/item_padding_large">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="fitEnd"
+            android:src="@drawable/ic_action_cancel"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/pq_btncancel" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Create question"
+            android:layout_toRightOf="@+id/pq_btncancel"
+            android:layout_toLeftOf="@+id/pq_btnsend"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingLeft="@dimen/item_padding_small"
+            android:paddingRight="@dimen/item_padding_small"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:id="@+id/pq_text" />
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:scaleType="fitEnd"
+            android:src="@drawable/ic_action_send_white"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/pq_btnsend" />
+        <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:visibility="gone"
+            android:id="@+id/pq_progressbar"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            app:mlpb_enable_circle_background="false" />
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Signed in as: "
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:id="@+id/pq_textname" />
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/item_padding_small">
+
+        <android.support.v7.widget.AppCompatEditText
+            android:id="@+id/pq_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Your question"
+            android:inputType="text"
+            android:imeOptions="actionDone"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:textColorHighlight="@android:color/white"
+            />
+    </android.support.design.widget.TextInputLayout>
+</LinearLayout>

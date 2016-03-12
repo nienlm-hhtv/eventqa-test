@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">EventQA-test</string>
+    <string name="action_settings">Settings</string>
+    <string name="tab_question">Questions</string>
+    <string name="tab_detail">Event information</string>
+    <string name="tab_user">You</string>
+</resources>
