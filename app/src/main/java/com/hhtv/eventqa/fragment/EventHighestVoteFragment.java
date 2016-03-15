@@ -215,10 +215,10 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
     @Override
     public void scroll(int position) {
-        /*int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
-        int lastVisible = gridLayoutManager.findLastVisibleItemPosition();*/
-        //mRecyclerView.scrollVerticallyToPosition(position);
-        //if (gridLayoutManager.findFirstVisibleItemPosition() != 0)
+        int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
+        //int lastVisible = gridLayoutManager.findLastVisibleItemPosition();
+
+        if (firstVisible < 2)
             gridLayoutManager.scrollToPosition(0);
     }
 

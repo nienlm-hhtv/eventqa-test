@@ -134,16 +134,17 @@ public class MainActivity extends AppCompatActivity
             @Override
             @DebugLog
             public void onClick(View v) {
+                mSheetLayout.expandFab();
                 /*if (UserUltis.getUserId(MainActivity.this) != -1) {
-                    mSheetLayout.expandFab();
+
                 } else {
                     Toast.makeText(MainActivity.this, "Login to post new question !", Toast.LENGTH_SHORT).show();
                 }*/
-                ViewPagerAdapter adapter = (ViewPagerAdapter) mPager.getAdapter();
+                /*ViewPagerAdapter adapter = (ViewPagerAdapter) mPager.getAdapter();
                 ((EventHighestVoteFragment) adapter.getItem(0)).processLoadQuestion(mModel.getId(), UserUltis.getUserId(
                                 MainActivity.this), false
                 );
-                ((EventQuestionFragment) adapter.getItem(1)).processUpdateQuestion();
+                ((EventQuestionFragment) adapter.getItem(1)).processUpdateQuestion();*/
             }
         });
         mSheetLayout.setFab(mFab);

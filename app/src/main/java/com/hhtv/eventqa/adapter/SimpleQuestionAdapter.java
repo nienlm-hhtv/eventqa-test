@@ -97,6 +97,25 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         }
         //if (hasTop)
             mFragment.scroll(0);
+        updateContent(newModels);
+    }
+
+    public void updateContent(List<Result> newModels){
+        for (int i = 0; i < mModel.size(); i++){
+            try {
+                Result oldModel = mModel.get(i);
+                Result newModel = newModels.get(i);
+                if (oldModel.getvote_up_count() == newModel.getvote_up_count()
+                        && oldModel.getvote_down_count() == newModel.getvote_down_count())
+                    continue;
+                oldModel.setvote_up_count(newModel.getvote_up_count());
+                oldModel.setvote_down_count(newModel.getvote_down_count());
+                notifyItemChanged(i);
+            }catch (Exception e){
+                e.printStackTrace();
+                continue;
+            }
+        }
     }
 
     private int switchItem(int from, int to){

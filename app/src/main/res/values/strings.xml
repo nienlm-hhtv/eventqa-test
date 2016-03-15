@@ -25,4 +25,7 @@
     <string name="username_cannot_be_blank">display name can not be blank !</string>
     <string name="password_must_has_atleast_6_letters">password must has at least 6 letters !</string>
     <string name="password_confirmation_incorrect">wrong password confirmation !</string>
+    <string name="event_not_found">Event not found !</string>
+    <string name="rescan">Rescan</string>
+    <string name="exit">Exit</string>
 </resources>

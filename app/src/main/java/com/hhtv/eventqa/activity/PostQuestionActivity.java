@@ -55,9 +55,9 @@ public class PostQuestionActivity extends Activity {
             onBackPressed();
         }
 
-        if (UserUltis.getUserId(this) == -1) {
+        /*if (UserUltis.getUserId(this) == -1) {
             onBackPressed();
-        }
+        }*/
         mTextName.setText("Signed in as: " + UserUltis.getUserName(this));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
