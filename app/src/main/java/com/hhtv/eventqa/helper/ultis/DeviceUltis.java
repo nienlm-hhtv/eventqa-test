@@ -1,4 +1,4 @@
-package com.hhtv.eventqa.helper;
+package com.hhtv.eventqa.helper.ultis;
 
 import android.content.Context;
 import android.content.SharedPreferences;

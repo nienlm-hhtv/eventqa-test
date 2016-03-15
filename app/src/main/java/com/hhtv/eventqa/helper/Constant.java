@@ -5,4 +5,5 @@ package com.hhtv.eventqa.helper;
  */
 public interface Constant {
      String APIENDPOINT = "http://vtproduction-001-site1.1tempurl.com";
+     String FAKEAPIENDPOINT = "http://demo3846615.mockable.io";
 }

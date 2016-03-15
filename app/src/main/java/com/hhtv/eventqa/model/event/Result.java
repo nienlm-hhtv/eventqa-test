@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Result {
 
-    private Integer id;
+    private int id;
     private String createAt;
     private String name;
     private String url;
@@ -30,7 +30,7 @@ public class Result {
      * @param name
      * @param url
      */
-    public Result(Integer id, String createAt, String name, String url, String description, String imageLink) {
+    public Result(int id, String createAt, String name, String url, String description, String imageLink) {
         this.id = id;
         this.createAt = createAt;
         this.name = name;
@@ -44,7 +44,7 @@ public class Result {
      * @return
      *     The id
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -53,7 +53,7 @@ public class Result {
      * @param id
      *     The id
      */
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 

@@ -14,6 +14,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -22,14 +23,18 @@ import android.widget.Toast;
 import com.github.fabtransitionactivity.SheetLayout;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.fragment.EventDetailFragment;
+import com.hhtv.eventqa.fragment.EventHighestVoteFragment;
 import com.hhtv.eventqa.fragment.EventQuestionFragment;
-import com.hhtv.eventqa.fragment.EventUserFragment;
-import com.hhtv.eventqa.helper.UserUltis;
+import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.event.EventDetail;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -40,15 +45,15 @@ import hugo.weaving.DebugLog;
  */
 public class EventDetailActivity extends AppCompatActivity implements SheetLayout.OnFabAnimationEndListener{
     private static final int[] tabIcons = {
+            R.drawable.ic_trending_up,
             R.drawable.ic_comment,
-            R.drawable.ic_info_outline,
-            R.drawable.ic_action_user
+            R.drawable.ic_info_outline
     };
 
     private static final int[] toolbarTitle = {
+            R.string.tab_most_voted,
             R.string.tab_question,
-            R.string.tab_detail,
-            R.string.tab_user
+            R.string.tab_detail
     };
 
     @Bind(R.id.eventdetail_toolbar)
@@ -153,15 +158,51 @@ public class EventDetailActivity extends AppCompatActivity implements SheetLayou
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initTimer();
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        cancelTimer();
+    }
 
+    Timer mTimer;
+    final int TIMER_DELAY = 10 * 1000;
+    public void initTimer(){
+        mTimer = new Timer();
+        mTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Log.d("MYTAG", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
+                ViewPagerAdapter adapter = (ViewPagerAdapter)mPager.getAdapter();
+                ((EventHighestVoteFragment)adapter.getItem(0)).processLoadQuestion(mModel.getId(), UserUltis.getUserId(
+                                EventDetailActivity.this), false
+                );
+                ((EventQuestionFragment)adapter.getItem(1)).processUpdateQuestion();
+
+            }
+        }, TIMER_DELAY, TIMER_DELAY);
+    }
+
+    public void cancelTimer(){
+        if (mTimer != null){
+            mTimer.cancel();
+            mTimer = null;
+        }
+    }
     private void setupViewPager(ViewPager viewPager) {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(EventQuestionFragment.newInstance(mModel.getId(), UserUltis.getUserId(
+        adapter.addFragment(EventHighestVoteFragment.newInstance(mModel.getId(), UserUltis.getUserId(
                 EventDetailActivity.this
         )), "ONE");
-        adapter.addFragment(EventDetailFragment.newInstance(mModel), "TWO");
-        adapter.addFragment(EventUserFragment.newInstance(), "THREE");
+        adapter.addFragment(EventQuestionFragment.newInstance(mModel.getId(), UserUltis.getUserId(
+                EventDetailActivity.this
+        )), "TWO");
+        adapter.addFragment(EventDetailFragment.newInstance(mModel), "THREE");
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

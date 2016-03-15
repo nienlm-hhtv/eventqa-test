@@ -3,7 +3,7 @@ package com.hhtv.eventqa.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,7 +18,6 @@ import com.hhtv.eventqa.activity.MainActivity;
 import com.hhtv.eventqa.adapter.SimpleQuestionAdapter;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
-import com.hhtv.eventqa.helper.ultis.DateTimeUltis;
 import com.hhtv.eventqa.helper.ultis.DeviceUltis;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.question.Question;
@@ -43,9 +42,9 @@ import retrofit.Retrofit;
 /**
  * Created by nienb on 1/3/16.
  */
-public class EventQuestionFragment extends BaseFragment implements IOnAdapterInteractListener {
-    public static EventQuestionFragment newInstance(int eventId, int userId) {
-        EventQuestionFragment f = new EventQuestionFragment();
+public class EventHighestVoteFragment extends BaseFragment implements IOnAdapterInteractListener {
+    public static EventHighestVoteFragment newInstance(int eventId, int userId) {
+        EventHighestVoteFragment f = new EventHighestVoteFragment();
         f.userId = userId;
         f.eventId = eventId;
         return f;
@@ -56,9 +55,10 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
 
     SimpleQuestionAdapter mAdapter = null;
-    LinearLayoutManager linearLayoutManager;
+    GridLayoutManager gridLayoutManager;
 
-    public EventQuestionFragment() {
+
+    public EventHighestVoteFragment() {
     }
 
     @Nullable
@@ -70,21 +70,25 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         ButterKnife.bind(this, v);
         firstLoad = true;
         mRecyclerView.setHasFixedSize(true);
-        linearLayoutManager = new LinearLayoutManager(getRealContext());
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), this);
+        gridLayoutManager = new GridLayoutManager(getRealContext(),1){
+            @Override
+            public boolean supportsPredictiveItemAnimations() {
+                return true;
+            }
+        };
+
+        mRecyclerView.setLayoutManager(gridLayoutManager);
         mRecyclerView.setEmptyView(getResources().getIdentifier("loading_view", "layout",
                 getRealContext().getPackageName()));
         mRecyclerView.setItemAnimator(new jp.wasabeef.recyclerview.animators.FadeInAnimator());
         mRecyclerView.getItemAnimator().setAddDuration(200);
-
         mRecyclerView.enableDefaultSwipeRefresh(true);
         mRecyclerView.setDefaultOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 firstLoad = true;
                 mRecyclerView.setRefreshing(true);
-                processUpdateQuestion();
+                processLoadQuestion(eventId, userId, false);
             }
         });
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -94,10 +98,10 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     if (addedItems.size() > 0){
                         Log.d("MYTAG","ONTOP");
-                        mAdapter.insertNewItem(addedItems, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                        mAdapter.insertNewItemOnBottom(addedItems, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
                             @Override
                             public void onComplete() {
-                                mRecyclerView.scrollVerticallyTo(0);
+                                //mRecyclerView.scrollVerticallyTo(0);
                             }
                         });
                         addedItems.clear();
@@ -115,7 +119,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 }
             }
         });
-        processLoadQuestion(eventId, userId);
+        processLoadQuestion(eventId, userId, true);
         return v;
     }
 
@@ -132,46 +136,51 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
     @Override
     public void onResume() {
         super.onResume();
-
         if (firstLoad = false)
             firstLoad = true;
     }
 
-    @Override
-    public void scroll(int position) {
-
-    }
 
     public List<Result> addedItems = new ArrayList<>();
-    public String updateData(Response<Vote> response) {
-        if (response.body().getChanged_questions().size() > 0) {
+    public String updateData(final List<List<Result>> m) {
+        List<Result> new_questions = m.get(0);
+        final List<Result> removed_questions = m.get(1);
+
             if (mAdapter != null) {
-                mAdapter.upDateItemChanged(response.body().getChanged_questions());
-            }
-        }
-        if (response.body().getNew_questions().size() > 0) {
-            if (mAdapter != null) {
-                addedItems.addAll(response.body().getNew_questions());
-                if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0){
-                    mAdapter.insertNewItem(response.body().getNew_questions(), new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                /*addedItems.addAll(new_questions);
+                Log.d("MYTAG:" ,"> " + gridLayoutManager.findFirstVisibleItemPosition() + " > "
+                        + mRecyclerView.canScrollVertically(-1));
+                int lastVisibleItemPosition = gridLayoutManager.findLastCompletelyVisibleItemPosition();
+                if (lastVisibleItemPosition != RecyclerView.NO_POSITION && lastVisibleItemPosition == mRecyclerView.getAdapter().getItemCount() - 1){
+                    mAdapter.insertNewItemOnBottom(new_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
                         @Override
                         public void onComplete() {
-                            mRecyclerView.scrollVerticallyTo(0);
+                            //mRecyclerView.scrollVerticallyTo(0);
                         }
                     });
                     addedItems.clear();
-                }
+                }*/
+                mAdapter.insertNewItemOnBottom(new_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                    @Override
+                    public void onComplete() {
+
+                            if (mAdapter != null) {
+                                mAdapter.removeItemsWithCallback(removed_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                                    @Override
+                                    public void onComplete() {
+                                        mAdapter.updatePosition(m.get(2));
+                                    }
+                                });
+                            }
+
+                    }
+                });
             }
-        }
-        if (response.body().getRemoved_questions().size() > 0) {
-            if (mAdapter != null) {
-                mAdapter.removeItems(response.body().getRemoved_questions());
-            }
-        }
-        return "new: " + response.body().getNew_questions().size()
-                + " change: " + response.body().getChanged_questions().size()
-                + " remove: " + response.body().getRemoved_questions().size()
-                + " url: " + response.raw().request().url();
+
+
+
+        return "new: " + new_questions.size()
+                + " remove: " + removed_questions.size();
     }
 
     @Override
@@ -180,10 +189,9 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
         }
-
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
-        Log.d("MYTAG","vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
+        Log.d("MYTAG","EHVF vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
         Call<Vote> call = api.vote(questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Vote>() {
             @Override
@@ -191,85 +199,51 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 mRecyclerView.setRefreshing(false);
                 Toast.makeText(getRealContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                 if (mAdapter == null) {
-                    mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), EventQuestionFragment.this);
+                    mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), EventHighestVoteFragment.this);
+                    mAdapter.setHasStableIds(true);
                     mRecyclerView.setAdapter(mAdapter);
                 }
-                Log.d("MYTAG", "vote: " + updateData(response));
-
+                processLoadQuestion(questionId, userId, false);
             }
             @Override
             public void onFailure(Throwable t) {
                 mRecyclerView.setRefreshing(false);
-                Toast.makeText(getRealContext(), "Network error !", Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(getRealContext(), "EHVF Network error !", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void processUpdateQuestion() {
-        ApiEndpoint api = ApiService.build();
-        Log.d("MYTAG","EQF update, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
-        Call<Vote> call = api.updateQuestionsList(DeviceUltis.getDeviceId(getRealContext()), eventId,
-                UserUltis.getUserId(getRealContext()));
-        call.enqueue(new Callback<Vote>() {
-            @Override
-            public void onResponse(Response<Vote> response, Retrofit retrofit) {
-                mRecyclerView.hideEmptyView();
-                mRecyclerView.setRefreshing(false);
-                if (mAdapter == null) {
-                    mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), EventQuestionFragment.this);
-                    mRecyclerView.setAdapter(mAdapter);
-                }
-                Log.d("MYTAG", "EQF update: " + updateData(response));
-                if (mAdapter.getItemCount() == 0) {
-                    mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
-                    ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                            .setText("No questions, tap to retry !");
-                    mRecyclerView.getEmptyView().findViewById(R.id.textView2).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            firstLoad = true;
-                            processLoadQuestion(eventId, userId);
-                        }
-                    });
-                    mRecyclerView.showEmptyView();
-                } else {
-                    mRecyclerView.hideEmptyView();
-                }
-            }
-            @Override
-            public void onFailure(Throwable t) {
-                mRecyclerView.setRefreshing(false);
-                Toast.makeText(getRealContext(), "EQF Network error !", Toast.LENGTH_SHORT).show();
-            }
-        });
+    @Override
+    public void scroll(int position) {
+        /*int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
+        int lastVisible = gridLayoutManager.findLastVisibleItemPosition();*/
+        //mRecyclerView.scrollVerticallyToPosition(position);
+        //if (gridLayoutManager.findFirstVisibleItemPosition() != 0)
+            gridLayoutManager.scrollToPosition(0);
     }
-
 
     int eventId = -1, userId = -1;
     boolean firstLoad = true;
     ArrayList<Result> mModels;
 
     @DebugLog
-    public void processLoadQuestion(final int eventId, final int userid) {
-        if (firstLoad) {
-            firstLoad = false;
-        } else {
-            return;
-        }
+    public void processLoadQuestion(final int eventId, final int userid,boolean loading) {
+
         this.eventId = eventId;
         this.userId = userid;
-        DateTimeUltis.setLastCheck(getRealContext());
-        mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
-        ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                .setText("Loading");
-        mRecyclerView.showEmptyView();
-        ApiEndpoint api = ApiService.build();
-        Call<Question> call = api.getAllQuestions(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
+        if (loading){
+            mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
+            ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
+                    .setText("Loading");
+            mRecyclerView.showEmptyView();
+        }
+        ApiEndpoint api = ApiService.fakeBuild();
+        Call<Question> call = api.getFakeHighestVoteQuestion(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Question>() {
             @Override
             public void onResponse(Response<Question> response, Retrofit retrofit) {
-                Log.d("MYTAG", "EQF url: " + response.raw().request().url());
+                mRecyclerView.setRefreshing(false);
+                Log.d("MYTAG", "EHVF url: " + response.raw().request().url());
                 mRecyclerView.hideEmptyView();
                 if (response.body().getResults().size() == 0) {
                     mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
@@ -279,21 +253,33 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         @Override
                         public void onClick(View v) {
                             firstLoad = true;
-                            processLoadQuestion(eventId, userid);
+                            processLoadQuestion(eventId, userid, true);
                         }
                     });
                     mRecyclerView.showEmptyView();
-                } else {
-                    mModels = new ArrayList<Result>();
-                    mModels.addAll(response.body().getResults());
-                    mAdapter = new SimpleQuestionAdapter(response.body().getResults(), EventQuestionFragment.this);
+                }
+                else if (mAdapter == null){
+                    mAdapter = new SimpleQuestionAdapter(response.body().getResults(), EventHighestVoteFragment.this);
+                    mAdapter.setHasStableIds(true);
                     mRecyclerView.setAdapter(mAdapter);
+                    mRecyclerView.hideEmptyView();
+                }
+                else {
+                    if (!(mRecyclerView.getAdapter() instanceof SimpleQuestionAdapter)){
+                        mRecyclerView.setAdapter(mAdapter);
+                    }
+                    List<Result> oldModel = mAdapter.getmModel();
+                    List<List<Result>> list = reArrangeModels(response.body().getResults());
+                    updateData(list);
+                    //mAdapter.setmModel(response.body().getResults());
+                    //mAdapter.notifyDataSetChanged();
+                    mRecyclerView.hideEmptyView();
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-                Log.d("MYTAG", "EQF on fail !");
+                Log.d("MYTAG", "EHVF on fail ! " + t.getMessage());
                 mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                 ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
                         .setText("Error, tap to retry !");
@@ -302,10 +288,47 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     @Override
                     public void onClick(View v) {
                         firstLoad = true;
-                        processLoadQuestion(eventId, userid);
+                        processLoadQuestion(eventId, userid,true);
                     }
                 });
             }
         });
+    }
+
+    List<List<Result>> reArrangeModels(List<Result> quesions){
+        List<List<Result>> finals = new ArrayList<>();
+        ResultArrayList new_questions = new ResultArrayList();
+        ResultArrayList removed_questions = new ResultArrayList();
+        List<Result> model = mAdapter.getmModel();
+
+        new_questions.addAll(quesions);
+        new_questions.removeDiff(model);
+        removed_questions.addAll(model);
+        removed_questions.removeDiff(quesions);
+        finals.add(new_questions);
+        finals.add(removed_questions);
+        finals.add(quesions);
+        Log.d("MYTAG","new: " + finals.get(0).size() + " removed: " + finals.get(1).size() + " original: "
+        +finals.get(2).size());
+        return finals;
+    }
+
+    public class ResultArrayList extends ArrayList<Result>{
+        public boolean removeDiff( List<Result> collection) {
+            for (Result result: collection
+                    ) {
+                int i = contain(result);
+                if (i != -1)
+                    remove(i);
+            }
+            return true;
+        }
+
+        public int contain(Result object) {
+            for (Result r : this) {
+                if (r.getId() == object.getId()) return indexOf(r);
+            }
+            return -1;
+        }
     }
 }

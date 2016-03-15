@@ -7,16 +7,16 @@ import java.util.Map;
 
 public class Result implements Serializable{
 
-    private Integer id;
+    private int id;
     private String name;
     private String body;
     private String create_at;
-    private Integer creator_id;
+    private int creator_id;
     private String creator_name;
-    private Integer vote_up_count;
-    private Integer vote_down_count;
+    private int vote_up_count;
+    private int vote_down_count;
     private Boolean isVoted;
-    private Integer status;
+    private int status;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
@@ -38,7 +38,7 @@ public class Result implements Serializable{
      * @param creator_id
      * @param isVoted
      */
-    public Result(Integer id, String name, String body, String create_at, Integer creator_id, String creator_name, Integer vote_up_count, Integer vote_down_count, Boolean isVoted, Integer status) {
+    public Result(int id, String name, String body, String create_at, int creator_id, String creator_name, int vote_up_count, int vote_down_count, Boolean isVoted, int status) {
         this.id = id;
         this.name = name;
         this.body = body;
@@ -64,7 +64,7 @@ public class Result implements Serializable{
      * @return
      *     The id
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -73,7 +73,7 @@ public class Result implements Serializable{
      * @param id
      *     The id
      */
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -136,7 +136,7 @@ public class Result implements Serializable{
      * @return
      *     The creator_id
      */
-    public Integer getcreator_id() {
+    public int getcreator_id() {
         return creator_id;
     }
 
@@ -145,7 +145,7 @@ public class Result implements Serializable{
      * @param creator_id
      *     The creator_id
      */
-    public void setcreator_id(Integer creator_id) {
+    public void setcreator_id(int creator_id) {
         this.creator_id = creator_id;
     }
 
@@ -154,7 +154,7 @@ public class Result implements Serializable{
      * @return
      *     The vote_up_count
      */
-    public Integer getvote_up_count() {
+    public int getvote_up_count() {
         return vote_up_count;
     }
 
@@ -163,7 +163,7 @@ public class Result implements Serializable{
      * @param vote_up_count
      *     The vote_up_count
      */
-    public void setvote_up_count(Integer vote_up_count) {
+    public void setvote_up_count(int vote_up_count) {
         this.vote_up_count = vote_up_count;
     }
 
@@ -172,7 +172,7 @@ public class Result implements Serializable{
      * @return
      *     The vote_down_count
      */
-    public Integer getvote_down_count() {
+    public int getvote_down_count() {
         return vote_down_count;
     }
 
@@ -181,7 +181,7 @@ public class Result implements Serializable{
      * @param vote_down_count
      *     The vote_down_count
      */
-    public void setvote_down_count(Integer vote_down_count) {
+    public void setvote_down_count(int vote_down_count) {
         this.vote_down_count = vote_down_count;
     }
 
@@ -208,7 +208,7 @@ public class Result implements Serializable{
      * @return
      *     The status
      */
-    public Integer getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -217,7 +217,7 @@ public class Result implements Serializable{
      * @param status
      *     The status
      */
-    public void setStatus(Integer status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

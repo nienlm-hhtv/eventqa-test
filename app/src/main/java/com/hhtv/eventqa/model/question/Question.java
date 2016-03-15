@@ -10,9 +10,9 @@ import java.util.Map;
 public class Question {
 
     private Boolean success;
-    private Integer total;
-    private Integer pages;
-    private Integer curPage;
+    private int total;
+    private int pages;
+    private int curPage;
     private List<Result> results = new ArrayList<Result>();
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -31,7 +31,7 @@ public class Question {
      * @param pages
      * @param success
      */
-    public Question(Boolean success, Integer total, Integer pages, Integer curPage, List<Result> results) {
+    public Question(Boolean success, int total, int pages, int curPage, List<Result> results) {
         this.success = success;
         this.total = total;
         this.pages = pages;
@@ -62,7 +62,7 @@ public class Question {
      * @return
      *     The total
      */
-    public Integer getTotal() {
+    public int getTotal() {
         return total;
     }
 
@@ -71,7 +71,7 @@ public class Question {
      * @param total
      *     The total
      */
-    public void setTotal(Integer total) {
+    public void setTotal(int total) {
         this.total = total;
     }
 
@@ -80,7 +80,7 @@ public class Question {
      * @return
      *     The pages
      */
-    public Integer getPages() {
+    public int getPages() {
         return pages;
     }
 
@@ -89,7 +89,7 @@ public class Question {
      * @param pages
      *     The pages
      */
-    public void setPages(Integer pages) {
+    public void setPages(int pages) {
         this.pages = pages;
     }
 
@@ -98,7 +98,7 @@ public class Question {
      * @return
      *     The curPage
      */
-    public Integer getCurPage() {
+    public int getCurPage() {
         return curPage;
     }
 
@@ -107,7 +107,7 @@ public class Question {
      * @param curPage
      *     The curPage
      */
-    public void setCurPage(Integer curPage) {
+    public void setCurPage(int curPage) {
         this.curPage = curPage;
     }
 

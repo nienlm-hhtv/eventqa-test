@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hhtv.eventqa.helper.listener.IOnAdapterInteractListener;
 import com.hhtv.eventqa.R;
-import com.hhtv.eventqa.fragment.EventQuestionFragment;
 import com.hhtv.eventqa.model.question.Result;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
@@ -32,11 +32,20 @@ import hugo.weaving.DebugLog;
 public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAdapter.ItemViewViewHolder> {
     private List<Result> mModel;
     private static final PrettyTime PT = new PrettyTime();
-    private EventQuestionFragment mFragment;
+    private IOnAdapterInteractListener mFragment;
 
-    public SimpleQuestionAdapter(List<Result> mModel, EventQuestionFragment mFragment) {
+    public SimpleQuestionAdapter(List<Result> mModel, IOnAdapterInteractListener mFragment) {
         this.mModel = mModel;
         this.mFragment = mFragment;
+    }
+
+    public void setmModel(List<Result> mModel) {
+        this.mModel = mModel;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mModel.get(position).hashCode();
     }
 
     @Override
@@ -48,16 +57,57 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @DebugLog
     public void insertNewItem(List<Result> results, IOnUpdateItemsComplete i) {
         for (Result result : results) {
-            int p = isItemInModel(result);
+            int p = isItemInModel(result.getId());
             if (p == -1) {
                 insert(mModel, result, 0);
                 Log.d("MYTAG", "insert item: " + result.getBody() + ". Size: " + mModel.size()
-                + " item: " + mModel.get(0).getBody());
+                        + " item: " + mModel.get(0).getBody());
             } else {
                 updateModel(result, p);
             }
         }
         i.onComplete();
+    }
+
+    @DebugLog
+    public void insertNewItemOnBottom(List<Result> results, IOnUpdateItemsComplete i) {
+        for (Result result : results) {
+            insert(mModel, result, mModel.size());
+        }
+        i.onComplete();
+    }
+
+    @DebugLog
+    public void removeItemsWithCallback(List<Result> results, IOnUpdateItemsComplete i) {
+        for (Result result : results) {
+            int p = isItemInModel(result.getId());
+            if (p != -1) {
+                remove(mModel, p);
+            }
+        }
+        i.onComplete();
+    }
+
+    public void updatePosition(List<Result> newModels){
+        boolean hasTop = false;
+        for (int i = 0; i < newModels.size(); i++){
+            int i1 = isItemInModel(newModels.get(i).getId());
+            if(switchItem(i1, i) > 0 && i1 == 0)
+                hasTop = true;
+        }
+        //if (hasTop)
+            mFragment.scroll(0);
+    }
+
+    private int switchItem(int from, int to){
+        if(from < 0 || to < 0)
+            return -1;
+        if (from  == to)
+            return -1;
+        Result r = mModel.remove(from);
+        mModel.add(to, r);
+        notifyItemMoved(from, to);
+        return 1;
     }
 
     public interface IOnUpdateItemsComplete{
@@ -67,7 +117,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @DebugLog
     public void removeItems(List<Result> results) {
         for (Result result : results) {
-            int p = isItemInModel(result);
+            int p = isItemInModel(result.getId());
             if (p != -1) {
                 remove(mModel, p);
             }
@@ -79,7 +129,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @DebugLog
     public void upDateItemChanged(List<Result> results) {
         for (Result result : results) {
-            int p = isItemInModel(result);
+            int p = isItemInModel(result.getId());
             //Log.d("MYTAG","update item in pos: " + p + " body: " + result.getBody());
             if (p != -1)
                 updateModel(result,p);
@@ -97,13 +147,13 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         notifyItemChanged(p);
     }
 
-    public int isItemInModel(Result item) {
+    /*public int isItemInModel(Result item) {
         for (Result r : mModel
                 ) {
             if (r.getBody().equals(item.getBody())) return mModel.indexOf(r);
         }
         return -1;
-    }
+    }*/
 
     public int isItemInModel(int id) {
         for (Result r : mModel
@@ -113,7 +163,9 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         return -1;
     }
 
-
+    public List<Result> getmModel() {
+        return mModel;
+    }
 
     @Override
     public ItemViewViewHolder onCreateViewHolder(ViewGroup parent) {

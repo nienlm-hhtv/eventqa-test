@@ -2,13 +2,17 @@ package com.hhtv.eventqa.api;
 
 import com.hhtv.eventqa.model.event.Event;
 import com.hhtv.eventqa.model.event.EventDetail;
+import com.hhtv.eventqa.model.postmodel.Signin;
+import com.hhtv.eventqa.model.postmodel.Signup;
 import com.hhtv.eventqa.model.question.Question;
 import com.hhtv.eventqa.model.question.Vote;
 import com.hhtv.eventqa.model.user.CreateUserResponse;
 import com.hhtv.eventqa.model.user.GetUserResponse;
 
 import retrofit.Call;
+import retrofit.http.Body;
 import retrofit.http.GET;
+import retrofit.http.POST;
 import retrofit.http.Query;
 
 /**
@@ -50,4 +54,13 @@ public interface ApiEndpoint {
 
     @GET("/api/test/createQuestion")
     Call<Vote> createQuestion(@Query("lastCheckstr") String lastCheckstr,@Query("eventid") int eventid, @Query("creatorid") int creatorid, @Query("body") String body);
+
+
+    @GET("/getHighestVoteQuestion")
+    Call<Question> getFakeHighestVoteQuestion(@Query("eventId") int eventId,@Query("userId") int userId,@Query("deviceid") String deviceid);
+
+    @POST("/signin")
+    Call<GetUserResponse> signin(@Body Signin user);
+    @POST("/signup")
+    Call<GetUserResponse> signup(@Body Signup user);
 }

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
-import com.hhtv.eventqa.helper.UserUltis;
+import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.user.CreateUserResponse;
 import com.hhtv.eventqa.model.user.GetUserResponse;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;

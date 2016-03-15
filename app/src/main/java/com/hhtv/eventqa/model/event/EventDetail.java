@@ -10,15 +10,15 @@ public class EventDetail implements Serializable{
 
     private Boolean success;
     private String message;
-    private Integer id;
+    private int id;
     private String name;
     private String description;
-    private Integer creator_id;
+    private int creator_id;
     private String creator_name;
     private String create_at;
-    private Integer total_question;
-    private Integer answered_question;
-    private Integer status;
+    private int total_question;
+    private int answered_question;
+    private int status;
     private String imageLink;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -44,7 +44,7 @@ public class EventDetail implements Serializable{
      * @param answered_question
      * @param success
      */
-    public EventDetail(Boolean success, String message, Integer id, String name, String description, String imageLink, Integer creator_id, String creator_name, String create_at, Integer total_question, Integer answered_question, Integer status) {
+    public EventDetail(Boolean success, String message, int id, String name, String description, String imageLink, int creator_id, String creator_name, String create_at, int total_question, int answered_question, int status) {
         this.success = success;
         this.message = message;
         this.id = id;
@@ -100,7 +100,7 @@ public class EventDetail implements Serializable{
      * @return
      *     The id
      */
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
@@ -109,7 +109,7 @@ public class EventDetail implements Serializable{
      * @param id
      *     The id
      */
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -170,7 +170,7 @@ public class EventDetail implements Serializable{
      * @return
      *     The creator_id
      */
-    public Integer getcreator_id() {
+    public int getcreator_id() {
         return creator_id;
     }
 
@@ -179,7 +179,7 @@ public class EventDetail implements Serializable{
      * @param creator_id
      *     The creator_id
      */
-    public void setcreator_id(Integer creator_id) {
+    public void setcreator_id(int creator_id) {
         this.creator_id = creator_id;
     }
 
@@ -224,7 +224,7 @@ public class EventDetail implements Serializable{
      * @return
      *     The total_question
      */
-    public Integer gettotal_question() {
+    public int gettotal_question() {
         return total_question;
     }
 
@@ -233,7 +233,7 @@ public class EventDetail implements Serializable{
      * @param total_question
      *     The total_question
      */
-    public void settotal_question(Integer total_question) {
+    public void settotal_question(int total_question) {
         this.total_question = total_question;
     }
 
@@ -242,7 +242,7 @@ public class EventDetail implements Serializable{
      * @return
      *     The answered_question
      */
-    public Integer getanswered_question() {
+    public int getanswered_question() {
         return answered_question;
     }
 
@@ -251,7 +251,7 @@ public class EventDetail implements Serializable{
      * @param answered_question
      *     The answered_question
      */
-    public void setanswered_question(Integer answered_question) {
+    public void setanswered_question(int answered_question) {
         this.answered_question = answered_question;
     }
 
@@ -260,7 +260,7 @@ public class EventDetail implements Serializable{
      * @return
      *     The status
      */
-    public Integer getStatus() {
+    public int getStatus() {
         return status;
     }
 
@@ -269,7 +269,7 @@ public class EventDetail implements Serializable{
      * @param status
      *     The status
      */
-    public void setStatus(Integer status) {
+    public void setStatus(int status) {
         this.status = status;
     }
 

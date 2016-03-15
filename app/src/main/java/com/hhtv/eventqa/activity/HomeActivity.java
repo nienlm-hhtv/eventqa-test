@@ -85,10 +85,10 @@ public class HomeActivity extends Activity {
                 public void onResponse(final Response<EventDetail> response, Retrofit retrofit) {
 
                     if (response.body().getSuccess()) {
-                        Intent i = new Intent(HomeActivity.this,EventDetailActivity.class);
+                        Intent i = new Intent(HomeActivity.this,MainActivity.class);
                         i.putExtra("curEvent", response.body());
                         startActivity(i);
-                        HomeActivity.this.finish();
+                        //HomeActivity.this.finish();
                     } else {
                         Toast.makeText(HomeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     }

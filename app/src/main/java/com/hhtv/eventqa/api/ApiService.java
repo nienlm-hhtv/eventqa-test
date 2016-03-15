@@ -22,5 +22,14 @@ public class ApiService {
     public static ApiEndpoint build() {
         return retrofit.create(ApiEndpoint.class);
     }
-
+    public static ApiEndpoint fakeBuild(){
+        Gson mgson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                .create();
+        Retrofit mretrofit = new Retrofit.Builder()
+                .baseUrl(Constant.FAKEAPIENDPOINT)
+                .addConverterFactory(GsonConverterFactory.create(mgson))
+                .build();
+        return mretrofit.create(ApiEndpoint.class);
+    }
 }
