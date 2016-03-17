@@ -24,10 +24,16 @@ public class UserUltis {
         editor.commit();
     }
 
+    public static void logout(Context mContext){
+        setUserId(mContext,-1);
+        setUserName(mContext,"Guest");
+        setUserEmail(mContext,"");
+    }
+
     public static String getUserName(Context mContext){
         SharedPreferences spfr = mContext.getSharedPreferences("userdata",
                 Context.MODE_PRIVATE);
-        return spfr.getString("2", "");
+        return spfr.getString("2", "Guest");
     }
 
     public static void setUserName(Context mContext, String name) {

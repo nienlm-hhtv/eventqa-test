@@ -5,7 +5,11 @@ import android.content.SharedPreferences;
 import android.telephony.TelephonyManager;
 
 import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+
+import hugo.weaving.DebugLog;
 
 /**
  * Created by nienb on 8/3/16.
@@ -37,12 +41,27 @@ public class DeviceUltis {
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = spfr.edit();
         editor.putString("uuid", s);
-        editor.commit();
+        editor.apply();
     }
 
 
     public static String nextSessionId() {
         SecureRandom random = new SecureRandom();
         return new BigInteger(130, random).toString(24);
+    }
+
+    @DebugLog
+    public static String toSHA1(String text) {
+        try {
+            MessageDigest mDigest = MessageDigest.getInstance("SHA1");
+            byte[] result = mDigest.digest(text.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < result.length; i++)
+                sb.append(Integer.toString((result[i] & 0xff) + 0x100, 16).substring(1));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

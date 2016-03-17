@@ -70,7 +70,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         ButterKnife.bind(this, v);
         firstLoad = true;
         mRecyclerView.setHasFixedSize(true);
-        gridLayoutManager = new GridLayoutManager(getRealContext(),1){
+        gridLayoutManager = new GridLayoutManager(getRealContext(), 1) {
             @Override
             public boolean supportsPredictiveItemAnimations() {
                 return true;
@@ -96,8 +96,8 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    if (addedItems.size() > 0){
-                        Log.d("MYTAG","ONTOP");
+                    if (addedItems.size() > 0) {
+                        Log.d("MYTAG", "ONTOP");
                         mAdapter.insertNewItemOnBottom(addedItems, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
                             @Override
                             public void onComplete() {
@@ -124,8 +124,6 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
     }
 
 
-
-
     @Override
     public void onPause() {
         super.onPause();
@@ -142,41 +140,26 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
 
     public List<Result> addedItems = new ArrayList<>();
+
     public String updateData(final List<List<Result>> m) {
         List<Result> new_questions = m.get(0);
         final List<Result> removed_questions = m.get(1);
 
-            if (mAdapter != null) {
-                /*addedItems.addAll(new_questions);
-                Log.d("MYTAG:" ,"> " + gridLayoutManager.findFirstVisibleItemPosition() + " > "
-                        + mRecyclerView.canScrollVertically(-1));
-                int lastVisibleItemPosition = gridLayoutManager.findLastCompletelyVisibleItemPosition();
-                if (lastVisibleItemPosition != RecyclerView.NO_POSITION && lastVisibleItemPosition == mRecyclerView.getAdapter().getItemCount() - 1){
-                    mAdapter.insertNewItemOnBottom(new_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
-                        @Override
-                        public void onComplete() {
-                            //mRecyclerView.scrollVerticallyTo(0);
-                        }
-                    });
-                    addedItems.clear();
-                }*/
-                mAdapter.insertNewItemOnBottom(new_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
-                    @Override
-                    public void onComplete() {
-
-                            if (mAdapter != null) {
-                                mAdapter.removeItemsWithCallback(removed_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
-                                    @Override
-                                    public void onComplete() {
-                                        mAdapter.updatePosition(m.get(2));
-                                    }
-                                });
+        if (mAdapter != null) {
+            mAdapter.insertNewItemOnBottom(new_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                @Override
+                public void onComplete() {
+                    if (mAdapter != null) {
+                        mAdapter.removeItemsWithCallback(removed_questions, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                            @Override
+                            public void onComplete() {
+                                mAdapter.updatePosition(m.get(2));
                             }
-
+                        });
                     }
-                });
-            }
-
+                }
+            });
+        }
 
 
         return "new: " + new_questions.size()
@@ -185,30 +168,32 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
     @Override
     public void processVote(final int questionId, final boolean up) {
-        if (UserUltis.getUserId(getRealContext()) == -1) {
+        /*if (UserUltis.getUserId(getRealContext()) == -1) {
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
-        Log.d("MYTAG","EHVF vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
-        Call<Vote> call = api.vote(questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
+        Log.d("MYTAG", "EHVF vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
+        Call<Vote> call = api.vote(eventId, questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Vote>() {
             @Override
             public void onResponse(Response<Vote> response, Retrofit retrofit) {
                 mRecyclerView.setRefreshing(false);
+                Log.d("MYTAG", "EHVF vote: " + response.raw().request().url());
                 Toast.makeText(getRealContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                 if (mAdapter == null) {
                     mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), EventHighestVoteFragment.this);
                     mAdapter.setHasStableIds(true);
                     mRecyclerView.setAdapter(mAdapter);
                 }
-                processLoadQuestion(questionId, userId, false);
+                processLoadQuestion(eventId, userId, false);
             }
+
             @Override
             public void onFailure(Throwable t) {
                 mRecyclerView.setRefreshing(false);
-                Toast.makeText(getRealContext(), "EHVF Network error !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getRealContext(), getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -224,21 +209,20 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
 
     int eventId = -1, userId = -1;
     boolean firstLoad = true;
-    ArrayList<Result> mModels;
 
     @DebugLog
-    public void processLoadQuestion(final int eventId, final int userid,boolean loading) {
+    public void processLoadQuestion(final int eventId, final int userid, boolean loading) {
 
         this.eventId = eventId;
         this.userId = userid;
-        if (loading){
+        if (loading) {
             mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
             ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                    .setText("Loading");
+                    .setText(getResources().getString(R.string.loading));
             mRecyclerView.showEmptyView();
         }
-        ApiEndpoint api = ApiService.fakeBuild();
-        Call<Question> call = api.getFakeHighestVoteQuestion(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
+        ApiEndpoint api = ApiService.build();
+        Call<Question> call = api.getHighestVoteQuestion(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Question>() {
             @Override
             public void onResponse(Response<Question> response, Retrofit retrofit) {
@@ -248,7 +232,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                 if (response.body().getResults().size() == 0) {
                     mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                     ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                            .setText("No questions, tap to retry !");
+                            .setText(getResources().getString(R.string.no_question_tap_to_retry));
                     mRecyclerView.getEmptyView().findViewById(R.id.textView2).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -257,22 +241,17 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                         }
                     });
                     mRecyclerView.showEmptyView();
-                }
-                else if (mAdapter == null){
+                } else if (mAdapter == null) {
                     mAdapter = new SimpleQuestionAdapter(response.body().getResults(), EventHighestVoteFragment.this);
                     mAdapter.setHasStableIds(true);
                     mRecyclerView.setAdapter(mAdapter);
                     mRecyclerView.hideEmptyView();
-                }
-                else {
-                    if (!(mRecyclerView.getAdapter() instanceof SimpleQuestionAdapter)){
+                } else {
+                    if (!(mRecyclerView.getAdapter() instanceof SimpleQuestionAdapter)) {
                         mRecyclerView.setAdapter(mAdapter);
                     }
-                    List<Result> oldModel = mAdapter.getmModel();
                     List<List<Result>> list = reArrangeModels(response.body().getResults());
                     updateData(list);
-                    //mAdapter.setmModel(response.body().getResults());
-                    //mAdapter.notifyDataSetChanged();
                     mRecyclerView.hideEmptyView();
                 }
             }
@@ -282,40 +261,40 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                 Log.d("MYTAG", "EHVF on fail ! " + t.getMessage());
                 mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                 ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                        .setText("Error, tap to retry !");
+                        .setText(getResources().getString(R.string.error_tap_to_retry));
                 mRecyclerView.showEmptyView();
                 mRecyclerView.getEmptyView().findViewById(R.id.textView2).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         firstLoad = true;
-                        processLoadQuestion(eventId, userid,true);
+                        processLoadQuestion(eventId, userid, true);
                     }
                 });
             }
         });
     }
 
-    List<List<Result>> reArrangeModels(List<Result> quesions){
+    List<List<Result>> reArrangeModels(List<Result> questions) {
         List<List<Result>> finals = new ArrayList<>();
         ResultArrayList new_questions = new ResultArrayList();
         ResultArrayList removed_questions = new ResultArrayList();
         List<Result> model = mAdapter.getmModel();
 
-        new_questions.addAll(quesions);
+        new_questions.addAll(questions);
         new_questions.removeDiff(model);
         removed_questions.addAll(model);
-        removed_questions.removeDiff(quesions);
+        removed_questions.removeDiff(questions);
         finals.add(new_questions);
         finals.add(removed_questions);
-        finals.add(quesions);
-        Log.d("MYTAG","new: " + finals.get(0).size() + " removed: " + finals.get(1).size() + " original: "
-        +finals.get(2).size());
+        finals.add(questions);
+        Log.d("MYTAG", "new: " + finals.get(0).size() + " removed: " + finals.get(1).size() + " original: "
+                + finals.get(2).size());
         return finals;
     }
 
-    public class ResultArrayList extends ArrayList<Result>{
-        public boolean removeDiff( List<Result> collection) {
-            for (Result result: collection
+    public class ResultArrayList extends ArrayList<Result> {
+        public boolean removeDiff(List<Result> collection) {
+            for (Result result : collection
                     ) {
                 int i = contain(result);
                 if (i != -1)

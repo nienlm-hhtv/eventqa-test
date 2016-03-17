@@ -12,7 +12,7 @@ import retrofit.Retrofit;
  */
 public class ApiService {
     static Gson gson = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+            .setDateFormat("yyyy-MM-dd HH:mm:ss")
             .create();
     static Retrofit retrofit = new Retrofit.Builder()
             .baseUrl(Constant.APIENDPOINT)
@@ -24,7 +24,7 @@ public class ApiService {
     }
     public static ApiEndpoint fakeBuild(){
         Gson mgson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
                 .create();
         Retrofit mretrofit = new Retrofit.Builder()
                 .baseUrl(Constant.FAKEAPIENDPOINT)

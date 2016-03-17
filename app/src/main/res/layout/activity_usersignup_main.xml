@@ -67,14 +67,15 @@
                     android:id="@+id/username"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
                     android:textColor="@android:color/white"
                     android:textColorHint="@android:color/white"
                     android:hint="Display name"/>
 
             </android.support.design.widget.TextInputLayout>
 
-            <android.support.design.widget.TextInputLayout
+            <!--<android.support.design.widget.TextInputLayout
                 android:id="@+id/userpasswordWrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,7 +106,7 @@
                     android:textColorHint="@android:color/white"
                     android:hint="Password confirm"/>
 
-            </android.support.design.widget.TextInputLayout>
+            </android.support.design.widget.TextInputLayout>-->
 
             <Button
                 android:id="@+id/signupbtn"

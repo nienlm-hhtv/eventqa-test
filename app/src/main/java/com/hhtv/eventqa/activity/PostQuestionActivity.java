@@ -90,6 +90,7 @@ public class PostQuestionActivity extends Activity {
         resultIntent.putExtra("post",false);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
+        overridePendingTransition(0,0);
     }
 
     @OnClick(R.id.pq_btnsend)
@@ -120,7 +121,7 @@ public class PostQuestionActivity extends Activity {
                 @Override
                 public void onFailure(Throwable t) {
                     DateTimeUltis.setLastCheck(PostQuestionActivity.this);
-                    Toast.makeText(PostQuestionActivity.this, "Network error !", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostQuestionActivity.this, getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
                     mBtnSend.setVisibility(View.VISIBLE);
                     mProg.setVisibility(View.GONE);
                 }

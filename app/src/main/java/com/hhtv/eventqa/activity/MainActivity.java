@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.afollestad.materialdialogs.Theme;
 import com.github.fabtransitionactivity.SheetLayout;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.fragment.EventDetailFragment;
@@ -33,7 +34,6 @@ import com.hhtv.eventqa.fragment.EventHighestVoteFragment;
 import com.hhtv.eventqa.fragment.EventQuestionFragment;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.event.EventDetail;
-import com.hhtv.eventqa.model.user.GetUserResponse;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import org.joda.time.DateTime;
@@ -50,7 +50,6 @@ import hugo.weaving.DebugLog;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SheetLayout.OnFabAnimationEndListener {
 
-    GetUserResponse user = null;
     private static final int[] tabIcons = {
             R.drawable.ic_trending_up,
             R.drawable.ic_comment,
@@ -87,24 +86,22 @@ public class MainActivity extends AppCompatActivity
         win.setAttributes(winParams);
     }
 
-    public void setupTabIcons(){
-        for (int i = 0; i < mTabs.getTabCount(); i++){
+    public void setupTabIcons() {
+        for (int i = 0; i < mTabs.getTabCount(); i++) {
             mTabs.getTabAt(i).setIcon(tabIcons[i]);
 
         }
     }
 
-    public void setPage(int position){
-        mPager.setCurrentItem(position, true);
-    }
 
     public EventDetail mModel;
     NavigationView navigationView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        mModel = (EventDetail)getIntent().getSerializableExtra("curEvent");
+        mModel = (EventDetail) getIntent().getSerializableExtra("curEvent");
         setContentView(R.layout.activity_main2);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.eventdetail_toolbar);
@@ -140,11 +137,6 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     Toast.makeText(MainActivity.this, "Login to post new question !", Toast.LENGTH_SHORT).show();
                 }*/
-                /*ViewPagerAdapter adapter = (ViewPagerAdapter) mPager.getAdapter();
-                ((EventHighestVoteFragment) adapter.getItem(0)).processLoadQuestion(mModel.getId(), UserUltis.getUserId(
-                                MainActivity.this), false
-                );
-                ((EventQuestionFragment) adapter.getItem(1)).processUpdateQuestion();*/
             }
         });
         mSheetLayout.setFab(mFab);
@@ -156,8 +148,8 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void setupNavigationView(){
-        if (UserUltis.getUserId(this) == -1){
+    private void setupNavigationView() {
+        if (UserUltis.getUserId(this) == -1) {
             navigationView.getMenu().clear();
             navigationView.inflateMenu(R.menu.activity_main_drawer_notsigned);
 
@@ -165,17 +157,17 @@ public class MainActivity extends AppCompatActivity
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_name).setVisibility(View.GONE);
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_email).setVisibility(View.GONE);
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_circle).setVisibility(View.GONE);
-        }else{
+        } else {
             navigationView.getMenu().clear();
             navigationView.inflateMenu(R.menu.activity_main_drawer);
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_ava).setVisibility(View.VISIBLE);
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_name).setVisibility(View.VISIBLE);
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_email).setVisibility(View.VISIBLE);
             navigationView.getHeaderView(0).findViewById(R.id.nav_header_circle).setVisibility(View.VISIBLE);
-            ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_header_ava)).setText(UserUltis.getUserName(this)
-            .substring(0,1).toUpperCase());
-            ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_header_name)).setText(UserUltis.getUserName(this));
-            ((TextView)navigationView.getHeaderView(0).findViewById(R.id.nav_header_email)).setText(UserUltis.getUserEmail(this));
+            ((TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_header_ava)).setText(UserUltis.getUserName(this)
+                    .substring(0, 1).toUpperCase());
+            ((TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_header_name)).setText(UserUltis.getUserName(this));
+            ((TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_header_email)).setText(UserUltis.getUserEmail(this));
         }
     }
 
@@ -192,8 +184,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     Timer mTimer;
-    final int TIMER_DELAY = 1000 * 1000;
-    public void initTimer(){
+    final int TIMER_DELAY = 10 * 1000;
+
+    public void initTimer() {
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -208,12 +201,13 @@ public class MainActivity extends AppCompatActivity
         }, TIMER_DELAY, TIMER_DELAY);
     }
 
-    public void cancelTimer(){
-        if (mTimer != null){
+    public void cancelTimer() {
+        if (mTimer != null) {
             mTimer.cancel();
             mTimer = null;
         }
     }
+
     private void setupViewPager(ViewPager viewPager) {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(EventHighestVoteFragment.newInstance(mModel.getId(), UserUltis.getUserId(
@@ -233,16 +227,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onPageSelected(int position) {
-                /*SpannableString s = new SpannableString(getResources().getString(toolbarTitle[position]));
-                s.setSpan(new TypefaceSpan(MainActivity.this, "titlefont.ttf"), 0, s.length(),
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);*/
                 getSupportActionBar().setTitle(getResources().getString(toolbarTitle[position]));
                 switch (position) {
                     case 0:
                         hideFab(false);
-                        /*((EventQuestionFragment) adapter.getItem(0)).processLoadQuestion(mModel.getId(), UserUltis.getUserId(
-                                MainActivity.this
-                        ));*/
                         break;
                     case 1:
                         hideFab(false);
@@ -261,19 +249,16 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public boolean isMFabShown(){
+    public boolean isMFabShown() {
         return mFab.isShown();
     }
-    public void reLoadQuestionTab(){
-        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter)mPager.getAdapter()).getItem(0);
-        f.processLoadQuestion(mModel.getId(), UserUltis.getUserId(this));
-    }
-    public void hideFab(boolean hide){
-        if (hide && mFab.isShown()){
+
+    public void hideFab(boolean hide) {
+        if (hide && mFab.isShown()) {
             mFab.hide();
             return;
         }
-        if (!hide && !mFab.isShown()){
+        if (!hide && !mFab.isShown()) {
             mFab.show();
         }
 
@@ -281,32 +266,34 @@ public class MainActivity extends AppCompatActivity
 
     public final int POSTQUESTIONREQCODE = 99;
     public final int SIGNINREQCODE = 100;
+
     @Override
     public void onFabAnimationEnd() {
         Intent intent = new Intent(MainActivity.this, PostQuestionActivity.class);
-        intent.putExtra("eventid",mModel.getId());
+        intent.putExtra("eventid", mModel.getId());
         startActivityForResult(intent, POSTQUESTIONREQCODE);
     }
+
     @Override
     @DebugLog
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case POSTQUESTIONREQCODE:
                 mSheetLayout.contractFab();
-                if (data.getBooleanExtra("post",false)){
+                if (data.getBooleanExtra("post", false)) {
                     try {
-                        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter)mPager.getAdapter())
+                        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
                                 .getItem(1);
                         f.processUpdateQuestion();
-                        EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter)mPager.getAdapter())
+                        EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter) mPager.getAdapter())
                                 .getItem(0);
                         hf.processLoadQuestion(mModel.getId(),
                                 UserUltis.getUserId(this), false);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }else{
+                } else {
 
                 }
                 break;
@@ -317,7 +304,7 @@ public class MainActivity extends AppCompatActivity
             default:
                 break;
         }
-        if(requestCode == POSTQUESTIONREQCODE){
+        if (requestCode == POSTQUESTIONREQCODE) {
 
         }
     }
@@ -351,18 +338,39 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
     }
-    
-    
+
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         FragmentManager f = getSupportFragmentManager();
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if(f.getBackStackEntryCount() != 0) {
+        } else if (f.getBackStackEntryCount() != 0) {
             f.popBackStack();
         } else {
-            super.onBackPressed();
+            //super.onBackPressed();
+            new MaterialDialog
+                    .Builder(MainActivity.this)
+                    .title(R.string.exit)
+                    .content(R.string.do_you_want_to_exit)
+                    .negativeText(R.string.dismiss)
+                    .theme(Theme.LIGHT)
+                    .positiveText(R.string.exit)
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            dialog.dismiss();
+                            MainActivity.this.finish();
+                            overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
+                        }
+                    }).show();
         }
     }
 
@@ -393,7 +401,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         if (id == R.id.nav_setting) {
 
@@ -407,26 +414,18 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onClick(MaterialDialog dialog, DialogAction which) {
                             dialog.dismiss();
-                            UserUltis.setUserId(MainActivity.this, -1);
+                            UserUltis.logout(MainActivity.this);
                             setupNavigationView();
                         }
                     }).show();
-        } else if (id == R.id.nav_signin){
+        } else if (id == R.id.nav_signin) {
             Intent i = new Intent(this, UserSigninActivity.class);
             startActivityForResult(i, SIGNINREQCODE);
-            overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
+            overridePendingTransition(R.anim.right_in, R.anim.left_out);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    public void goToEventEditPage(int eventId){
-        /*android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        EditEventFragment editEventFragment = EditEventFragment.newInstance(user, EditEventFragment.ActionType.EDIT, eventId);
-        transaction.replace(R.id.main_framelayout, editEventFragment).addToBackStack("EditEventFragment");
-        transaction.commit();*/
-    }
-
 }

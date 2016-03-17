@@ -33,7 +33,7 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="202"
+        android:text="1"
         android:id="@+id/homeactivity_edittext"/>
     <Button
         android:layout_width="wrap_content"

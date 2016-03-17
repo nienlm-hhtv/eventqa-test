@@ -61,13 +61,12 @@ public class EventDetailFragment extends BaseFragment{
     }
 
     public Date getPostDate(String src){
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
             Date date = format.parse(src);
             return date;
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return Calendar.getInstance().getTime();
         }

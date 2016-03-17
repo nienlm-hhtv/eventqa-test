@@ -4,27 +4,27 @@ package com.hhtv.eventqa.model.postmodel;
  * Created by nienb on 15/3/16.
  */
 public class Signin {
-    private String useremail;
-    private String userpassword;
+    private String username;
+    private String password;
 
-    public String getUseremail() {
-        return useremail;
+    public Signin(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public void setUseremail(String useremail) {
-        this.useremail = useremail;
+    public String getUsername() {
+        return username;
     }
 
-    public String getUserpassword() {
-        return userpassword;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setUserpassword(String userpassword) {
-        this.userpassword = userpassword;
+    public String getPassword() {
+        return password;
     }
 
-    public Signin(String useremail, String userpassword) {
-        this.useremail = useremail;
-        this.userpassword = userpassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

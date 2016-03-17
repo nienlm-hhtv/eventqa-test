@@ -3,7 +3,7 @@ package com.hhtv.eventqa.fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,12 +12,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hhtv.eventqa.helper.listener.IOnAdapterInteractListener;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.activity.MainActivity;
 import com.hhtv.eventqa.adapter.SimpleQuestionAdapter;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
+import com.hhtv.eventqa.helper.listener.IOnAdapterInteractListener;
 import com.hhtv.eventqa.helper.ultis.DateTimeUltis;
 import com.hhtv.eventqa.helper.ultis.DeviceUltis;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
@@ -56,8 +56,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
 
     SimpleQuestionAdapter mAdapter = null;
-    LinearLayoutManager linearLayoutManager;
-
+    GridLayoutManager gridLayoutManager;
     public EventQuestionFragment() {
     }
 
@@ -70,12 +69,18 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         ButterKnife.bind(this, v);
         firstLoad = true;
         mRecyclerView.setHasFixedSize(true);
-        linearLayoutManager = new LinearLayoutManager(getRealContext());
-        mRecyclerView.setLayoutManager(linearLayoutManager);
+        gridLayoutManager = new GridLayoutManager(getRealContext(), 1) {
+            @Override
+            public boolean supportsPredictiveItemAnimations() {
+                return true;
+            }
+        };
+
+        mRecyclerView.setLayoutManager(gridLayoutManager);
         mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), this);
         mRecyclerView.setEmptyView(getResources().getIdentifier("loading_view", "layout",
                 getRealContext().getPackageName()));
-        mRecyclerView.setItemAnimator(new jp.wasabeef.recyclerview.animators.FadeInAnimator());
+        mRecyclerView.setItemAnimator(new jp.wasabeef.recyclerview.animators.SlideInLeftAnimator());
         mRecyclerView.getItemAnimator().setAddDuration(200);
 
         mRecyclerView.enableDefaultSwipeRefresh(true);
@@ -97,7 +102,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         mAdapter.insertNewItem(addedItems, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
                             @Override
                             public void onComplete() {
-                                mRecyclerView.scrollVerticallyTo(0);
+                                //mRecyclerView.scrollVerticallyTo(0);
                             }
                         });
                         addedItems.clear();
@@ -139,11 +144,18 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
     @Override
     public void scroll(int position) {
-
+        int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
+        int lastVisible = gridLayoutManager.findLastVisibleItemPosition();
+        int visibleItem = lastVisible - firstVisible;
+        //int scrollto = (firstVisible - position < 0)? 0 : firstVisible - position ;
+        if (firstVisible < visibleItem){
+            gridLayoutManager.scrollToPosition(0);
+        }
+        Log.d("MYTAG", "f: " + firstVisible + " l: " + lastVisible + "p: " + position);
     }
 
     public List<Result> addedItems = new ArrayList<>();
-    public String updateData(Response<Vote> response) {
+    public String updateData(final Response<Vote> response) {
         if (response.body().getChanged_questions().size() > 0) {
             if (mAdapter != null) {
                 mAdapter.upDateItemChanged(response.body().getChanged_questions());
@@ -152,7 +164,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         if (response.body().getNew_questions().size() > 0) {
             if (mAdapter != null) {
                 addedItems.addAll(response.body().getNew_questions());
-                if (linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0){
+                /*if (gridLayoutManager.findFirstCompletelyVisibleItemPosition() == 0){
                     mAdapter.insertNewItem(response.body().getNew_questions(), new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
                         @Override
                         public void onComplete() {
@@ -160,7 +172,15 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         }
                     });
                     addedItems.clear();
-                }
+                }*/
+
+                mAdapter.insertNewItem(response.body().getNew_questions(), new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+                    @Override
+                    public void onComplete() {
+                        //mRecyclerView.scrollVerticallyTo(0);
+                        scroll(response.body().getNew_questions().size());
+                    }
+                });
             }
         }
         if (response.body().getRemoved_questions().size() > 0) {
@@ -184,7 +204,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG","vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
-        Call<Vote> call = api.vote(questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
+        Call<Vote> call = api.vote(eventId, questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Vote>() {
             @Override
             public void onResponse(Response<Vote> response, Retrofit retrofit) {
@@ -200,7 +220,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             @Override
             public void onFailure(Throwable t) {
                 mRecyclerView.setRefreshing(false);
-                Toast.makeText(getRealContext(), "Network error !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getRealContext(), getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -209,6 +229,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
     public void processUpdateQuestion() {
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG","EQF update, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
+
         Call<Vote> call = api.updateQuestionsList(DeviceUltis.getDeviceId(getRealContext()), eventId,
                 UserUltis.getUserId(getRealContext()));
         call.enqueue(new Callback<Vote>() {
@@ -224,7 +245,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 if (mAdapter.getItemCount() == 0) {
                     mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                     ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                            .setText("No questions, tap to retry !");
+                            .setText(getResources().getString(R.string.no_question_tap_to_retry));
                     mRecyclerView.getEmptyView().findViewById(R.id.textView2).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -240,7 +261,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             @Override
             public void onFailure(Throwable t) {
                 mRecyclerView.setRefreshing(false);
-                Toast.makeText(getRealContext(), "EQF Network error !", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getRealContext(), getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -262,7 +283,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         DateTimeUltis.setLastCheck(getRealContext());
         mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
         ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                .setText("Loading");
+                .setText(getResources().getString(R.string.loading));
         mRecyclerView.showEmptyView();
         ApiEndpoint api = ApiService.build();
         Call<Question> call = api.getAllQuestions(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
@@ -274,7 +295,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 if (response.body().getResults().size() == 0) {
                     mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                     ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                            .setText("No questions, tap to retry !");
+                            .setText(getResources().getString(R.string.no_question_tap_to_retry));
                     mRecyclerView.getEmptyView().findViewById(R.id.textView2).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -284,7 +305,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     });
                     mRecyclerView.showEmptyView();
                 } else {
-                    mModels = new ArrayList<Result>();
+                    mModels = new ArrayList<>();
                     mModels.addAll(response.body().getResults());
                     mAdapter = new SimpleQuestionAdapter(response.body().getResults(), EventQuestionFragment.this);
                     mRecyclerView.setAdapter(mAdapter);
@@ -293,10 +314,10 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
             @Override
             public void onFailure(Throwable t) {
-                Log.d("MYTAG", "EQF on fail !");
+                Log.d("MYTAG", "EQF on fail ! " + t.getMessage());
                 mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                 ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                        .setText("Error, tap to retry !");
+                        .setText(getResources().getString(R.string.error_tap_to_retry));
                 mRecyclerView.showEmptyView();
                 mRecyclerView.getEmptyView().findViewById(R.id.textView2).setOnClickListener(new View.OnClickListener() {
                     @Override

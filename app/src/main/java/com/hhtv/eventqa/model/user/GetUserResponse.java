@@ -1,90 +1,124 @@
-
 package com.hhtv.eventqa.model.user;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class GetUserResponse {
 
-    private Boolean success;
-    private Integer code;
-    private String useremail;
+    private String status;
+    private boolean success;
+    private String code;
     private String username;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private String email;
 
-
-    public String getUseremail() {
-        return useremail;
+    /**
+     * No args constructor for use in serialization
+     *
+     */
+    public GetUserResponse() {
     }
 
-    public void setUseremail(String useremail) {
-        this.useremail = useremail;
+    /**
+     *
+     * @param username
+     * @param email
+     * @param status
+     * @param code
+     * @param success
+     */
+    public GetUserResponse(String status, boolean success, String code, String username, String email) {
+        this.status = status;
+        this.success = success;
+        this.code = code;
+        this.username = username;
+        this.email = email;
     }
 
+    /**
+     *
+     * @return
+     * The status
+     */
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     *
+     * @param status
+     * The status
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     *
+     * @return
+     * The success
+     */
+    public boolean isSuccess() {
+        return success;
+    }
+
+    /**
+     *
+     * @param success
+     * The success
+     */
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    /**
+     *
+     * @return
+     * The code
+     */
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     *
+     * @param code
+     * The code
+     */
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    /**
+     *
+     * @return
+     * The username
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     *
+     * @param username
+     * The username
+     */
     public void setUsername(String username) {
         this.username = username;
     }
 
     /**
-     * No args constructor for use in serialization
-     * 
-     */
-    public GetUserResponse() {
-    }
-
-    public GetUserResponse(Boolean success, Integer code, String useremail, String username) {
-        this.success = success;
-        this.code = code;
-        this.useremail = useremail;
-        this.username = username;
-    }
-
-    /**
-     * 
+     *
      * @return
-     *     The success
+     * The email
      */
-    public Boolean getSuccess() {
-        return success;
+    public String getEmail() {
+        return email;
     }
 
     /**
-     * 
-     * @param success
-     *     The success
+     *
+     * @param email
+     * The email
      */
-    public void setSuccess(Boolean success) {
-        this.success = success;
-    }
-
-    /**
-     * 
-     * @return
-     *     The code
-     */
-    public Integer getCode() {
-        return code;
-    }
-
-    /**
-     * 
-     * @param code
-     *     The code
-     */
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    public void setEmail(String email) {
+        this.email = email;
     }
 
 }

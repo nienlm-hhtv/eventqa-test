@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.api.ApiService;
+import com.hhtv.eventqa.helper.ultis.PasswordHasher;
 import com.hhtv.eventqa.model.event.EventDetail;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -26,7 +27,7 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
- * Created by nienb on 29/2/16.
+ * Created by nienb on 10/3/16.
  */
 public class HomeActivity extends Activity {
 
@@ -53,6 +54,8 @@ public class HomeActivity extends Activity {
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
         tintManager.setStatusBarTintResource(R.color.colorPrimary);
+        //DeviceUltis.toSHA1("loremlipsum");
+        Log.d("MYTAG","pass: " + new PasswordHasher().createHash("N0vP%^ZFcVRyKepW6GqxvVIx"));
     }
 
     @TargetApi(19)
@@ -79,15 +82,17 @@ public class HomeActivity extends Activity {
     void onDirectBtnPressed() {
         try {
             String id = mEdittext.getText().toString();
+
             Call<EventDetail> call = ApiService.build().getEventDetail(id);
             call.enqueue(new Callback<EventDetail>() {
                 @Override
                 public void onResponse(final Response<EventDetail> response, Retrofit retrofit) {
-
+                    Log.d("MYTAG", response.raw().request().urlString());
                     if (response.body().getSuccess()) {
                         Intent i = new Intent(HomeActivity.this,MainActivity.class);
                         i.putExtra("curEvent", response.body());
                         startActivity(i);
+                        overridePendingTransition(R.anim.right_in, R.anim.left_out);
                         //HomeActivity.this.finish();
                     } else {
                         Toast.makeText(HomeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();

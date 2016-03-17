@@ -62,6 +62,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
                 insert(mModel, result, 0);
                 Log.d("MYTAG", "insert item: " + result.getBody() + ". Size: " + mModel.size()
                         + " item: " + mModel.get(0).getBody());
+                notifyItemRangeChanged(0, mModel.size());
             } else {
                 updateModel(result, p);
             }
@@ -149,7 +150,6 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     public void upDateItemChanged(List<Result> results) {
         for (Result result : results) {
             int p = isItemInModel(result.getId());
-            //Log.d("MYTAG","update item in pos: " + p + " body: " + result.getBody());
             if (p != -1)
                 updateModel(result,p);
         }
@@ -166,13 +166,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         notifyItemChanged(p);
     }
 
-    /*public int isItemInModel(Result item) {
-        for (Result r : mModel
-                ) {
-            if (r.getBody().equals(item.getBody())) return mModel.indexOf(r);
-        }
-        return -1;
-    }*/
+
 
     public int isItemInModel(int id) {
         for (Result r : mModel
@@ -205,13 +199,12 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     }
 
     public Date getPostDate(String src) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         format.setTimeZone(TimeZone.getTimeZone("UTC"));
         try {
             Date date = format.parse(src);
             return date;
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return Calendar.getInstance().getTime();
         }

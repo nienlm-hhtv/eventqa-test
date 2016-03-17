@@ -1,99 +1,82 @@
-
 package com.hhtv.eventqa.model.user;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CreateUserResponse {
 
-    private Boolean success;
-    private Integer userid;
-    private String useremail;
-    private String username;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private String status;
+    private boolean success;
+    private String msg;
 
     /**
      * No args constructor for use in serialization
-     * 
+     *
      */
     public CreateUserResponse() {
     }
 
-    public CreateUserResponse(Boolean success, Integer userid, String useremail, String username) {
+    /**
+     *
+     * @param status
+     * @param msg
+     * @param success
+     */
+    public CreateUserResponse(String status, boolean success, String msg) {
+        this.status = status;
         this.success = success;
-        this.userid = userid;
-        this.useremail = useremail;
-        this.username = username;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+        this.msg = msg;
     }
 
     /**
-     * 
+     *
      * @return
-     *     The success
+     * The status
      */
-    public Boolean getSuccess() {
+    public String getStatus() {
+        return status;
+    }
+
+    /**
+     *
+     * @param status
+     * The status
+     */
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    /**
+     *
+     * @return
+     * The success
+     */
+    public boolean isSuccess() {
         return success;
     }
 
     /**
-     * 
+     *
      * @param success
-     *     The success
+     * The success
      */
-    public void setSuccess(Boolean success) {
+    public void setSuccess(boolean success) {
         this.success = success;
     }
 
     /**
-     * 
+     *
      * @return
-     *     The userid
+     * The msg
      */
-    public Integer getUserid() {
-        return userid;
+    public String getMsg() {
+        return msg;
     }
 
     /**
-     * 
-     * @param userid
-     *     The userid
+     *
+     * @param msg
+     * The msg
      */
-    public void setUserid(Integer userid) {
-        this.userid = userid;
-    }
-
-    /**
-     * 
-     * @return
-     *     The useremail
-     */
-    public String getUseremail() {
-        return useremail;
-    }
-
-    /**
-     * 
-     * @param useremail
-     *     The useremail
-     */
-    public void setUseremail(String useremail) {
-        this.useremail = useremail;
-    }
-
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
 }

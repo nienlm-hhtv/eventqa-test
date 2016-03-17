@@ -18,7 +18,6 @@ import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
-import com.hhtv.eventqa.model.postmodel.Signin;
 import com.hhtv.eventqa.model.user.GetUserResponse;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 
@@ -93,16 +92,15 @@ public class UserSigninActivity extends Activity {
         loadingDialog.show();
         String useremailtext = useremail.getText().toString().trim();
         String userpasswordtext = userpassword.getText().toString().trim();
-        ApiEndpoint api = ApiService.fakeBuild();
-        //TODO fake build
-        Call<GetUserResponse> call = api.signin(new Signin(useremailtext, userpasswordtext));
+        ApiEndpoint api = ApiService.build();
+        Call<GetUserResponse> call = api.signin(useremailtext, userpasswordtext);
         call.enqueue(new Callback<GetUserResponse>() {
             @Override
             public void onResponse(Response<GetUserResponse> response, Retrofit retrofit) {
                 loadingDialog.dismiss();
-                if (response.body().getSuccess()){
-                    UserUltis.setUserId(UserSigninActivity.this, response.body().getCode());
-                    UserUltis.setUserEmail(UserSigninActivity.this, response.body().getUseremail());
+                if (response.body().isSuccess()){
+                    UserUltis.setUserId(UserSigninActivity.this, Integer.parseInt(response.body().getCode()));
+                    UserUltis.setUserEmail(UserSigninActivity.this, response.body().getEmail());
                     UserUltis.setUserName(UserSigninActivity.this, response.body().getUsername());
                     finish();
                 }else{
@@ -140,13 +138,19 @@ public class UserSigninActivity extends Activity {
     private void onSignupbtnPressed(){
         Intent i = new Intent(this, UserSignupActivity.class);
         startActivityForResult(i, SIGNUPREQCODE);
+        overridePendingTransition(R.anim.right_in, R.anim.left_out);
     }
     private void onBackbtnPressed(){
         Intent resultIntent = new Intent();
         resultIntent.putExtra("signup",false);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
+    }
+
+    @Override
+    public void onBackPressed() {
+        onBackbtnPressed();
     }
 
     @OnClick({R.id.signinbtn, R.id.signupbtn, R.id.backbtn})

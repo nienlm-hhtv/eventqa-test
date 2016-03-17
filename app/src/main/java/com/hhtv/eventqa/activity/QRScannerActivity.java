@@ -1,17 +1,14 @@
 package com.hhtv.eventqa.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
-import com.google.gson.Gson;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
@@ -35,8 +32,6 @@ public class QRScannerActivity extends FragmentActivity {
     ScannerLiveView mCamera;
     @Bind(R.id.qrscanner_progressbar)
     CircleProgressBar mLoading;
-
-    Gson gson;
     ApiEndpoint api;
 
     @Override
@@ -65,7 +60,6 @@ public class QRScannerActivity extends FragmentActivity {
 
             @Override
             public void onCodeScanned(String data) {
-                //Toast.makeText(QRScannerActivity.this, data, Toast.LENGTH_SHORT).show();
                 Log.d("MYTAG", "data scanned: " + data);
                 mLoading.setVisibility(View.VISIBLE);
                 Call<EventDetail> call = api.getEventDetail(data);
@@ -74,34 +68,9 @@ public class QRScannerActivity extends FragmentActivity {
                     public void onResponse(final Response<EventDetail> response, Retrofit retrofit) {
                         mLoading.setVisibility(View.INVISIBLE);
                         if (response.body().getSuccess()) {
-                            /*PostQuestionFragment f = PostQuestionFragment.newInstance(response.body(), QRScannerActivity.this);
-                            FragmentManager fm = getSupportFragmentManager();
-                            f.show(fm, "");*/
                             mCamera.stopScanner();
-                            /*AlertDialog.Builder builder =
-                                    new AlertDialog.Builder(QRScannerActivity.this, R.style.AppCompatAlertDialogStyle);
-                            builder.setTitle("Event found !");
-                            builder.setMessage("Event " + response.body().getName() + " found ! Would you like to participate ?");
-                            builder.setPositiveButton("Participate", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    gotoEventDetail(response.body());
-                                }
-                            });
-                            builder.setNegativeButton("Rescan", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mCamera.startScanner();
-                                    dialog.dismiss();
-                                }
-                            });
-                            builder.show();*/
-
                             gotoEventDetail(response.body());
                         } else {
-                            /*Toast.makeText(QRScannerActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                            QRScannerActivity.this.finish();*/
                             mCamera.stopScanner();
                             new MaterialDialog
                                     .Builder(QRScannerActivity.this)
@@ -130,31 +99,31 @@ public class QRScannerActivity extends FragmentActivity {
 
                     @Override
                     public void onFailure(Throwable t) {
-                        Log.d("MYTAG", "retrofit: " + t.getMessage());
+                        Log.d("MYTAG", "QR code retrofit error: " + t.getMessage());
                         mLoading.setVisibility(View.INVISIBLE);
-                        //Toast.makeText(QRScannerActivity.this, "Network error", Toast.LENGTH_SHORT).show();
-                        //QRScannerActivity.this.finish();
                         mCamera.stopScanner();
-                        AlertDialog.Builder builder =
-                                new AlertDialog.Builder(QRScannerActivity.this, R.style.AppCompatAlertDialogStyle);
-                        builder.setTitle("Event not found !");
-                        builder.setMessage("Network error or incorrect QR code, please try again !");
-                        builder.setPositiveButton("Rescan", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                mCamera.startScanner();
-                            }
-                        });
-                        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                mCamera.stopScanner();
-                                dialog.dismiss();
-                                QRScannerActivity.this.finish();
-                            }
-                        });
-                        builder.show();
+                        new MaterialDialog
+                                .Builder(QRScannerActivity.this)
+                                .title(R.string.event_not_found)
+                                .content(R.string.ev_not_found_or_wrong_qr)
+                                .negativeText(R.string.exit)
+                                .theme(Theme.LIGHT)
+                                .positiveText(R.string.rescan)
+                                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                                        mCamera.stopScanner();
+                                        dialog.dismiss();
+                                        QRScannerActivity.this.finish();
+                                    }
+                                })
+                                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                    @Override
+                                    public void onClick(MaterialDialog dialog, DialogAction which) {
+                                        dialog.dismiss();
+                                        mCamera.startScanner();
+                                    }
+                                }).show();
 
                     }
                 });
@@ -164,7 +133,7 @@ public class QRScannerActivity extends FragmentActivity {
 
 
     public void gotoEventDetail(EventDetail eventDetail) {
-        Intent i = new Intent(this, EventDetailActivity.class);
+        Intent i = new Intent(this, MainActivity.class);
         i.putExtra("curEvent", eventDetail);
         startActivity(i);
         this.finish();

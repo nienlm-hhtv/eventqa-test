@@ -2,15 +2,14 @@ package com.hhtv.eventqa.api;
 
 import com.hhtv.eventqa.model.event.Event;
 import com.hhtv.eventqa.model.event.EventDetail;
-import com.hhtv.eventqa.model.postmodel.Signin;
-import com.hhtv.eventqa.model.postmodel.Signup;
 import com.hhtv.eventqa.model.question.Question;
 import com.hhtv.eventqa.model.question.Vote;
 import com.hhtv.eventqa.model.user.CreateUserResponse;
 import com.hhtv.eventqa.model.user.GetUserResponse;
 
 import retrofit.Call;
-import retrofit.http.Body;
+import retrofit.http.Field;
+import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
 import retrofit.http.POST;
 import retrofit.http.Query;
@@ -27,24 +26,22 @@ public interface ApiEndpoint {
     Call<Question> getQuestion(@Query("eventId") int eventId,@Query("userId") int userId,
                                @Query("page") int page,@Query("pageSize") int pageSize);
 
-    @GET("/api/test/GetAllQuestions")
-    Call<Question> getAllQuestions(@Query("eventId") int eventId,@Query("userId") int userId,@Query("deviceid") String deviceid);
+    @GET("/api/event/getQuestions")
+    Call<Question> getAllQuestions(@Query("event_id") int eventId,@Query("user_id") int userId,@Query("device_id") String deviceid);
 
 
-    @GET("/api/test/GetQuestionByPivot")
-    Call<Question> getQuestionByPivot(@Query("eventId") int eventId,@Query("userId") int userId,
-                                      @Query("questionid") int questionid,@Query("up") boolean up);
-    @GET("/api/test/Vote")
-    Call<Vote> vote(@Query("voteId") int voteId, @Query("userId") int userId, @Query("up") boolean up
-            ,@Query("lastCheckstr") String lastCheckstr);
 
-    @GET("/api/test/updateQuestions")
-    Call<Vote> updateQuestionsList(@Query("lastCheckstr") String lastCheckstr,
-                                    @Query("eventid") int eventid,
-                                    @Query("creatorid") int creatorid);
+    @GET("/api/event/voteQuestion")
+    Call<Vote> vote(@Query("event_id") int eventId, @Query("question_id") int voteId, @Query("user_id") int userId, @Query("vote_status") boolean up
+            ,@Query("device_id") String lastCheckstr);
 
-    @GET("/api/test/getEventDetail")
-    Call<EventDetail> getEventDetail(@Query("eventid") String eventid);
+    @GET("/api/event/getUpdatedQuestions")
+    Call<Vote> updateQuestionsList(@Query("device_id") String lastCheckstr,
+                                    @Query("event_id") int eventid,
+                                    @Query("user_id") int creatorid);
+
+    @GET("/api/event/getEventDetail")
+    Call<EventDetail> getEventDetail(@Query("id") String eventid);
 
     @GET("/api/test/getUser")
     Call<GetUserResponse> getUser(@Query("useremail") String useremail);
@@ -56,11 +53,28 @@ public interface ApiEndpoint {
     Call<Vote> createQuestion(@Query("lastCheckstr") String lastCheckstr,@Query("eventid") int eventid, @Query("creatorid") int creatorid, @Query("body") String body);
 
 
-    @GET("/getHighestVoteQuestion")
-    Call<Question> getFakeHighestVoteQuestion(@Query("eventId") int eventId,@Query("userId") int userId,@Query("deviceid") String deviceid);
+    @GET("/api/event/getHighestVoteQuestions")
+    Call<Question> getHighestVoteQuestion(@Query("event_id") int eventId,@Query("user_id")
+        int userId,@Query("device_id") String deviceid);
 
-    @POST("/signin")
-    Call<GetUserResponse> signin(@Body Signin user);
-    @POST("/signup")
-    Call<GetUserResponse> signup(@Body Signup user);
+    @FormUrlEncoded
+    @POST("/api/event/getUser/")
+    Call<GetUserResponse> signin(@Field("username") String username, @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("/api/event/registerUser/")
+    Call<CreateUserResponse> signup(@Field("username") String username, @Field("email") String email);
+
+    @GET("/api/test/GetAllQuestions")
+    Call<Question> getAllFakeQuestions(
+            @Query("eventId") int eventId,
+            @Query("userId") int userId,
+            @Query("deviceid") String deviceid);
+    @GET("/api/test/updateQuestions")
+    Call<Vote> updateFakeQuestionsList(@Query("lastCheckstr") String lastCheckstr,
+                                   @Query("eventid") int eventid,
+                                   @Query("creatorid") int creatorid);
+    @GET("/api/test/getEventDetail")
+    Call<EventDetail> getFakeEventDetail(@Query("eventid") String eventid);
+
 }
