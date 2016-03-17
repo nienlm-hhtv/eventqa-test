@@ -1,6 +1,5 @@
 package com.hhtv.eventqa.api;
 
-import com.hhtv.eventqa.model.event.Event;
 import com.hhtv.eventqa.model.event.EventDetail;
 import com.hhtv.eventqa.model.question.Question;
 import com.hhtv.eventqa.model.question.Vote;
@@ -19,12 +18,6 @@ import retrofit.http.Query;
  */
 public interface ApiEndpoint {
 
-    @GET("/api/test/GetEvents")
-    Call<Event> getEvent(@Query("page") int page, @Query("pageSize") int pageSize);
-
-    @GET("/api/test/GetQuestion")
-    Call<Question> getQuestion(@Query("eventId") int eventId,@Query("userId") int userId,
-                               @Query("page") int page,@Query("pageSize") int pageSize);
 
     @GET("/api/event/getQuestions")
     Call<Question> getAllQuestions(@Query("event_id") int eventId,@Query("user_id") int userId,@Query("device_id") String deviceid);
@@ -43,14 +36,12 @@ public interface ApiEndpoint {
     @GET("/api/event/getEventDetail")
     Call<EventDetail> getEventDetail(@Query("id") String eventid);
 
-    @GET("/api/test/getUser")
-    Call<GetUserResponse> getUser(@Query("useremail") String useremail);
-
-    @GET("/api/test/createUser")
-    Call<CreateUserResponse> createUser(@Query("useremail") String useremail, @Query("name") String name);
-
-    @GET("/api/test/createQuestion")
-    Call<Vote> createQuestion(@Query("lastCheckstr") String lastCheckstr,@Query("eventid") int eventid, @Query("creatorid") int creatorid, @Query("body") String body);
+    @GET("/api/event/createQuestion")
+    Call<CreateUserResponse> createQuestion(
+            @Query("event_id") int event_id,
+            @Query("user_id") int user_id,
+            @Query("device_id") String  device_id,
+            @Query("content") String content);
 
 
     @GET("/api/event/getHighestVoteQuestions")

@@ -196,10 +196,10 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
     @Override
     public void processVote(final int questionId, final boolean up) {
-        if (UserUltis.getUserId(getRealContext()) == -1) {
+        /*if (UserUltis.getUserId(getRealContext()) == -1) {
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
-        }
+        }*/
 
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
