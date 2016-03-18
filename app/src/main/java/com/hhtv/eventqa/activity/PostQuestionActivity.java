@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.View;
@@ -23,7 +22,6 @@ import com.hhtv.eventqa.helper.ultis.DeviceUltis;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.user.CreateUserResponse;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -62,13 +60,13 @@ public class PostQuestionActivity extends Activity {
             onBackPressed();
         }*/
         mTextName.setText("Signed in as: " + UserUltis.getUserName(this));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
 
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.colorAccent);
+        tintManager.setStatusBarTintResource(R.color.colorAccent);*/
     }
     @TargetApi(19)
     private void setTranslucentStatus(boolean on) {
@@ -91,6 +89,7 @@ public class PostQuestionActivity extends Activity {
     public void onBackPressed() {
         Intent resultIntent = new Intent();
         resultIntent.putExtra("post",false);
+        resultIntent.putExtra("body","");
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
         overridePendingTransition(0,0);
@@ -117,6 +116,7 @@ public class PostQuestionActivity extends Activity {
                         Toast.makeText(PostQuestionActivity.this, response.body().getMsg(), Toast.LENGTH_SHORT).show();
                         Intent resultIntent = new Intent();
                         resultIntent.putExtra("post",true);
+                        resultIntent.putExtra("body",mEdittext.getText().toString());
                         setResult(Activity.RESULT_OK, resultIntent);
                         finish();
                         overridePendingTransition(0,0);

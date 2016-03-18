@@ -2,7 +2,6 @@ package com.hhtv.eventqa.activity;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -34,7 +33,6 @@ import com.hhtv.eventqa.fragment.EventHighestVoteFragment;
 import com.hhtv.eventqa.fragment.EventQuestionFragment;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.event.EventDetail;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import org.joda.time.DateTime;
 
@@ -107,13 +105,13 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.eventdetail_toolbar);
         setSupportActionBar(toolbar);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
 
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.colorPrimary);
+        tintManager.setStatusBarTintResource(R.color.colorPrimary);*/
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -192,11 +190,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void run() {
                 Log.d("MYTAG", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
-                ViewPagerAdapter adapter = (ViewPagerAdapter) mPager.getAdapter();
-                ((EventHighestVoteFragment) adapter.getItem(0)).processLoadQuestion(mModel.getId(), UserUltis.getUserId(
-                                MainActivity.this), false
-                );
-                ((EventQuestionFragment) adapter.getItem(1)).processUpdateQuestion();
+                reloadContent();
             }
         }, TIMER_DELAY, TIMER_DELAY);
     }
@@ -240,7 +234,6 @@ public class MainActivity extends AppCompatActivity
                         break;
                 }
             }
-
             @Override
             public void onPageScrollStateChanged(int state) {
 
@@ -274,6 +267,19 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, POSTQUESTIONREQCODE);
     }
 
+    public void reloadContent(){
+        EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                .getItem(0);
+        hf.processLoadQuestion(mModel.getId(),
+                UserUltis.getUserId(this), false);
+        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                .getItem(1);
+        f.processUpdateQuestion();
+        EventDetailFragment ed = (EventDetailFragment) ((ViewPagerAdapter)mPager.getAdapter())
+                .getItem(2);
+        ed.updateEventDetail();
+    }
+
     @Override
     @DebugLog
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -281,20 +287,15 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode) {
             case POSTQUESTIONREQCODE:
                 mSheetLayout.contractFab();
-                if (data.getBooleanExtra("post", false)) {
-                    try {
-                        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
-                                .getItem(1);
-                        f.processUpdateQuestion();
-                        EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter) mPager.getAdapter())
-                                .getItem(0);
-                        hf.processLoadQuestion(mModel.getId(),
-                                UserUltis.getUserId(this), false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-
+                boolean isPost = data.getBooleanExtra("post",false);
+                if (isPost){
+                    EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                            .getItem(1);
+                    f.instantInsert(data.getStringExtra("body"));
+                    /*EventQuestionFragment f2 = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                            .getItem(0);
+                    f2.instantInsert(data.getStringExtra("body"));*/
+                    reloadContent();
                 }
                 break;
             case SIGNINREQCODE:
@@ -303,9 +304,6 @@ public class MainActivity extends AppCompatActivity
                 break;
             default:
                 break;
-        }
-        if (requestCode == POSTQUESTIONREQCODE) {
-
         }
     }
 

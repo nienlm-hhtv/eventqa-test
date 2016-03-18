@@ -2,6 +2,7 @@ package com.hhtv.eventqa.helper.ultis;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.provider.Settings;
 import android.telephony.TelephonyManager;
 
 import java.math.BigInteger;
@@ -18,11 +19,16 @@ public class DeviceUltis {
     public static String getDeviceId(Context mContext){
         TelephonyManager tManager = (TelephonyManager)mContext.getSystemService(Context.TELEPHONY_SERVICE);
         String uuid = tManager.getDeviceId();
-        if (uuid != ""){
+        /*if (uuid != ""){
             return "mobile-" + uuid;
         }else{
             return "mobile-" + getSavedUUID(mContext);
+        }*/
+        if (uuid == null){
+            uuid = Settings.Secure.getString(mContext.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
         }
+        return "mobile-" + uuid;
     }
 
     public static String getSavedUUID(Context mContext){

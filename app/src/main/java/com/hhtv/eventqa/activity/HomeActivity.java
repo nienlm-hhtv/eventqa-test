@@ -3,7 +3,6 @@ package com.hhtv.eventqa.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
@@ -14,9 +13,7 @@ import android.widget.Toast;
 
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.api.ApiService;
-import com.hhtv.eventqa.helper.ultis.PasswordHasher;
 import com.hhtv.eventqa.model.event.EventDetail;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -47,15 +44,15 @@ public class HomeActivity extends Activity {
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
 
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.colorPrimary);
+        tintManager.setStatusBarTintResource(R.color.colorPrimary);*/
         //DeviceUltis.toSHA1("loremlipsum");
-        Log.d("MYTAG","pass: " + new PasswordHasher().createHash("N0vP%^ZFcVRyKepW6GqxvVIx"));
+        //Log.d("MYTAG","pass: " + new PasswordHasher().createHash("N0vP%^ZFcVRyKepW6GqxvVIx"));
     }
 
     @TargetApi(19)
@@ -75,6 +72,8 @@ public class HomeActivity extends Activity {
     void onQRCodeBtnPressed() {
         Intent i = new Intent(this, QRScannerActivity.class);
         startActivity(i);
+        finish();
+        overridePendingTransition(R.anim.right_in, R.anim.left_out);
     }
 
 

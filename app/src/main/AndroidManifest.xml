@@ -27,6 +27,26 @@
         <activity android:name=".activity.QRScannerActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
         <activity android:name=".activity.PostQuestionActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize"></activity>
+        <activity
+            android:name=".activity.DeepLinkActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="true"
+            android:noHistory="true">
+            <intent-filter android:label="@string/app_name">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://event.hhtv.vn/detail-event-page” -->
+                <data android:scheme="http"
+                    android:host="event.hhtv.vn"
+                    android:pathPrefix="/detail-event-page" />
+                <!-- note that the leading "/" is required for pathPrefix-->
+                <!-- Accepts URIs that begin with "eventqa://detail-event-page” -->
+                <data android:scheme="eventqa"
+                    android:host="detail-event-page" />
+
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

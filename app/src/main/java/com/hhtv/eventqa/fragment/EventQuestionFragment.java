@@ -28,6 +28,8 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -194,13 +196,27 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 + " url: " + response.raw().request().url();
     }
 
+    public void instantInsert(String body){
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        String now = new DateTime(DateTimeZone.UTC).toString(dtf);
+        Result result = new Result(-1, "", body, now, -1, "", 0, 0, false, 1);
+        mAdapter.insert(mAdapter.getmModel(), result, 0);
+        gridLayoutManager.scrollToPosition(0);
+    }
+
     @Override
-    public void processVote(final int questionId, final boolean up) {
+    public void processVote(final Result question, int pos, final boolean up) {
         /*if (UserUltis.getUserId(getRealContext()) == -1) {
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
         }*/
 
+        if (question.getIsVoted()){
+
+            return;
+        }
+        mAdapter.getmModel().get(pos).setIsVoted(true);
+        final int questionId = question.getId();
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG","vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
@@ -224,6 +240,12 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
 
             }
         });
+    }
+
+    @Override
+    public void showToast(String toast) {
+        Toast.makeText(getRealContext(), getResources().getString(R.string.you_already_vote_this_question),
+                Toast.LENGTH_SHORT).show();
     }
 
     public void processUpdateQuestion() {
@@ -260,6 +282,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             }
             @Override
             public void onFailure(Throwable t) {
+                Log.d("MYTAG","EQF update fail: " + t.getMessage());
                 mRecyclerView.setRefreshing(false);
                 Toast.makeText(getRealContext(), getResources().getString(R.string.network_error), Toast.LENGTH_SHORT).show();
             }

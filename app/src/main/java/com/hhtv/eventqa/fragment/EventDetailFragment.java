@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.hhtv.eventqa.R;
+import com.hhtv.eventqa.api.ApiEndpoint;
+import com.hhtv.eventqa.api.ApiService;
 import com.hhtv.eventqa.model.event.EventDetail;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -22,6 +24,10 @@ import java.util.TimeZone;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
+import retrofit.Retrofit;
 
 /**
  * Created by nienb on 1/3/16.
@@ -44,7 +50,7 @@ public class EventDetailFragment extends BaseFragment{
     TextView mTextDes;
     @Bind(R.id.f_evdetail_statistic)
     TextView mTextStatistic;
-
+    ApiEndpoint api = ApiService.build();
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,5 +76,26 @@ public class EventDetailFragment extends BaseFragment{
             e.printStackTrace();
             return Calendar.getInstance().getTime();
         }
+    }
+
+    public void updateEventDetail(){
+        Call<EventDetail> call = api.getEventDetail(mModel.getId() + "");
+        call.enqueue(new Callback<EventDetail>() {
+            @Override
+            public void onResponse(Response<EventDetail> response, Retrofit retrofit) {
+                if (response.isSuccess()){
+                    if (response.body() != null && response.body().getSuccess()){
+                        mModel = response.body();
+                        mTextStatistic.setText("Total questions: " + mModel.gettotal_question() + ". Answerred: " + mModel.getanswered_question());
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
+
     }
 }

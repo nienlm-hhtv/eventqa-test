@@ -15,9 +15,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="colorControlNormal">#FFFFFF</item>
-        <item name="colorControlActivated">#FFFFFF</item>
-        <item name="colorControlHighlight">#FFFFFF</item>
+
     </style>
 
 

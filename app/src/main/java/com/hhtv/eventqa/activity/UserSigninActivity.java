@@ -3,7 +3,6 @@ package com.hhtv.eventqa.activity;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -19,7 +18,6 @@ import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.user.GetUserResponse;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -66,13 +64,13 @@ public class UserSigninActivity extends Activity {
         setContentView(R.layout.activity_usersignin_main);
         ButterKnife.bind(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             setTranslucentStatus(true);
         }
 
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setStatusBarTintResource(R.color.colorPrimary);
+        tintManager.setStatusBarTintResource(R.color.colorPrimary);*/
         networkfailDialog = new MaterialDialog.Builder(UserSigninActivity.this)
                 .title(R.string.network_error)
                 .content(R.string.please_check_connection)

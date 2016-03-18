@@ -57,7 +57,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @DebugLog
     public void insertNewItem(List<Result> results, IOnUpdateItemsComplete i) {
         for (Result result : results) {
-            int p = isItemInModel(result.getId());
+            int p = isItemInModel(result.getBody());
             if (p == -1) {
                 insert(mModel, result, 0);
                 Log.d("MYTAG", "insert item: " + result.getBody() + ". Size: " + mModel.size()
@@ -107,10 +107,12 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
                 Result oldModel = mModel.get(i);
                 Result newModel = newModels.get(i);
                 if (oldModel.getvote_up_count() == newModel.getvote_up_count()
-                        && oldModel.getvote_down_count() == newModel.getvote_down_count())
+                        && oldModel.getvote_down_count() == newModel.getvote_down_count()
+                        && oldModel.getIsVoted() == newModel.getIsVoted())
                     continue;
                 oldModel.setvote_up_count(newModel.getvote_up_count());
                 oldModel.setvote_down_count(newModel.getvote_down_count());
+                oldModel.setIsVoted(newModel.getIsVoted());
                 notifyItemChanged(i);
             }catch (Exception e){
                 e.printStackTrace();
@@ -128,6 +130,20 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         mModel.add(to, r);
         notifyItemMoved(from, to);
         return 1;
+    }
+
+    private void instantswitch(int from, int vote){
+        Result r = mModel.remove(from);
+        for (Result re: mModel
+             ) {
+            if (re.getvote_up_count() <= vote){
+                int to = mModel.indexOf(re);
+                mModel.add(to, r);
+                notifyItemMoved(from, to);
+                return;
+            }
+
+        }
     }
 
     public interface IOnUpdateItemsComplete{
@@ -158,6 +174,12 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @DebugLog
     public void updateModel(Result item, int p) {
         Result r = mModel.get(p);
+        r.setId(item.getId());
+        r.setName(item.getName());
+        r.setBody(item.getBody());
+        r.setcreate_at(item.getcreate_at());
+        r.setcreator_id(item.getcreator_id());
+        r.setCreator_name(item.getCreator_name());
         r.setStatus(item.getStatus());
         r.setvote_down_count(item.getvote_down_count());
         r.setvote_up_count(item.getvote_up_count());
@@ -172,6 +194,14 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         for (Result r : mModel
                 ) {
             if (r.getId() == id) return mModel.indexOf(r);
+        }
+        return -1;
+    }
+
+    public int isItemInModel(String body) {
+        for (Result r : mModel
+                ) {
+            if (r.getBody().equals(body)) return mModel.indexOf(r);
         }
         return -1;
     }
@@ -213,7 +243,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @Override
     public void onBindViewHolder(final ItemViewViewHolder holder, final int position) {
         holder.mId.setText(mModel.get(position).getId() + "");
-        holder.mUserName.setText(mModel.get(position).getCreator_name());
+        holder.mUserName.setText((mModel.get(position).getCreator_name().equals(""))? "Guest" : mModel.get(position).getCreator_name());
         holder.mVoteUpCount.setText(mModel.get(position).getvote_up_count() + "");
         holder.mVoteDownCount.setText(mModel.get(position).getvote_down_count() + "");
         holder.mContent.setText(mModel.get(position).getBody());
@@ -223,10 +253,14 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         holder.mVoteUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int pos = isItemInModel(Integer.parseInt(holder.mId.getText().toString()));
-                if (pos != -1){
-                    Log.d("MYTAG", "press vote at position: " + pos + ". item: " + mModel.get(position).getBody());
-                    mFragment.processVote(mModel.get(pos).getId(), true);
+                int pos = isItemInModel(holder.mContent.getText().toString().trim());
+                if (pos != -1 && !mModel.get(pos).getIsVoted()){
+                    holder.mVoteUpCount.setText((Integer.parseInt(holder.mVoteUpCount.getText().toString()) + 1) + "");
+                    Log.d("MYTAG", "press vote at position: " + pos + ". item: " + mModel.get(pos).getBody());
+                    instantswitch(pos, mModel.get(pos).getvote_up_count() + 1);
+                    mFragment.processVote(mModel.get(pos), pos,  true);
+                }else{
+                    mFragment.showToast("");
                 }
 
             }
@@ -234,14 +268,21 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         holder.mVoteDownBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int pos = isItemInModel(Integer.parseInt(holder.mId.getText().toString()));
-                if (pos != -1){
+                int pos = isItemInModel(holder.mContent.getText().toString().trim());
+                if (pos != -1 && !mModel.get(pos).getIsVoted()){
+
+                    holder.mVoteDownCount.setText((Integer.parseInt(holder.mVoteDownCount.getText().toString()) + 1) + "");
                     Log.d("MYTAG", "press vote at position: " + pos + ". item: " + mModel.get(pos).getBody());
-                    mFragment.processVote(mModel.get(pos).getId(), false);
+                    mFragment.processVote(mModel.get(pos), pos, false);
+                }else{
+                    mFragment.showToast("");
                 }
+
             }
         });
     }
+
+
 
     @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {

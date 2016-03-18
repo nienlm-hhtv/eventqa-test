@@ -12,12 +12,12 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.hhtv.eventqa.helper.listener.IOnAdapterInteractListener;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.activity.MainActivity;
 import com.hhtv.eventqa.adapter.SimpleQuestionAdapter;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
+import com.hhtv.eventqa.helper.listener.IOnAdapterInteractListener;
 import com.hhtv.eventqa.helper.ultis.DeviceUltis;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.question.Question;
@@ -165,13 +165,23 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         return "new: " + new_questions.size()
                 + " remove: " + removed_questions.size();
     }
-
+    /*public void instantInsert(String body){
+        DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+        String now = new DateTime(DateTimeZone.UTC).toString(dtf);
+        Result result = new Result(-1, "", body, now, -1, "", 0, 0, false, 1);
+        mAdapter.insert(mAdapter.getmModel(), result, mAdapter.getmModel().size());
+    }*/
     @Override
-    public void processVote(final int questionId, final boolean up) {
+    public void processVote(final Result question, int pos, final boolean up) {
         /*if (UserUltis.getUserId(getRealContext()) == -1) {
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
         }*/
+        if (question.getIsVoted()){
+            return;
+        }
+        mAdapter.getmModel().get(pos).setIsVoted(true);
+        final int questionId = question.getId();
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG", "EHVF vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
@@ -187,7 +197,8 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                     mAdapter.setHasStableIds(true);
                     mRecyclerView.setAdapter(mAdapter);
                 }
-                processLoadQuestion(eventId, userId, false);
+                //processLoadQuestion(eventId, userId, false);
+                ((MainActivity)getRealContext()).reloadContent();
             }
 
             @Override
@@ -197,7 +208,11 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
             }
         });
     }
-
+    @Override
+    public void showToast(String toast) {
+        Toast.makeText(getRealContext(), getResources().getString(R.string.you_already_vote_this_question),
+                Toast.LENGTH_SHORT).show();
+    }
     @Override
     public void scroll(int position) {
         int firstVisible = gridLayoutManager.findFirstVisibleItemPosition();
