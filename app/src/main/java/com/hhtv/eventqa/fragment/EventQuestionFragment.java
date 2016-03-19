@@ -122,7 +122,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 }
             }
         });
-        processLoadQuestion(eventId, userId);
+        processLoadQuestion(eventId, userId, true);
         return v;
     }
 
@@ -196,31 +196,44 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 + " url: " + response.raw().request().url();
     }
 
+    @DebugLog
     public void instantInsert(String body){
         DateTimeFormatter dtf = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
         String now = new DateTime(DateTimeZone.UTC).toString(dtf);
-        Result result = new Result(-1, "", body, now, -1, "", 0, 0, false, 1);
-        mAdapter.insert(mAdapter.getmModel(), result, 0);
-        gridLayoutManager.scrollToPosition(0);
+        final Result result = new Result(-1, "", body, now, -1, "", 0, 0, false, 1);
+        /*mAdapter.insert(mAdapter.getmModel(), result, 0);
+        gridLayoutManager.scrollToPosition(0);*/
+        if (mAdapter != null && mAdapter.getItemCount() == 0){
+            mRecyclerView.hideEmptyView();
+        }
+        mAdapter.insertNewItem(new ArrayList<Result>() {{
+            add(result);
+        }}, new SimpleQuestionAdapter.IOnUpdateItemsComplete() {
+            @Override
+            public void onComplete() {
+                //mRecyclerView.scrollVerticallyTo(0);
+                //scroll(0);
+            }
+        });
     }
 
     @Override
-    public void processVote(final Result question, int pos, final boolean up) {
+    public void processVote(int id, int pos, final boolean up) {
         /*if (UserUltis.getUserId(getRealContext()) == -1) {
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
         }*/
 
-        if (question.getIsVoted()){
+        /*if (question.getIsVoted()){
 
             return;
-        }
+        }*/
         mAdapter.getmModel().get(pos).setIsVoted(true);
-        final int questionId = question.getId();
+        /*final int questionId = question.getId();*/
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG","vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
-        Call<Vote> call = api.vote(eventId, questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
+        Call<Vote> call = api.vote(eventId, id, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Vote>() {
             @Override
             public void onResponse(Response<Vote> response, Retrofit retrofit) {
@@ -233,6 +246,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 Log.d("MYTAG", "vote: " + updateData(response));
 
             }
+
             @Override
             public void onFailure(Throwable t) {
                 mRecyclerView.setRefreshing(false);
@@ -248,7 +262,13 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 Toast.LENGTH_SHORT).show();
     }
 
+    boolean isAdapterEmpty = true;
     public void processUpdateQuestion() {
+        if (isAdapterEmpty || mAdapter.getItemCount() == 0){
+            firstLoad = true;
+            processLoadQuestion(eventId, userId, false);
+            return;
+        }
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG","EQF update, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
 
@@ -259,6 +279,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
             public void onResponse(Response<Vote> response, Retrofit retrofit) {
                 mRecyclerView.hideEmptyView();
                 mRecyclerView.setRefreshing(false);
+                Log.d("MYTAG2","mAdapter: " + (mAdapter == null) );
                 if (mAdapter == null) {
                     mAdapter = new SimpleQuestionAdapter(new ArrayList<Result>(), EventQuestionFragment.this);
                     mRecyclerView.setAdapter(mAdapter);
@@ -272,7 +293,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         @Override
                         public void onClick(View v) {
                             firstLoad = true;
-                            processLoadQuestion(eventId, userId);
+                            processLoadQuestion(eventId, userId, true);
                         }
                     });
                     mRecyclerView.showEmptyView();
@@ -295,7 +316,8 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
     ArrayList<Result> mModels;
 
     @DebugLog
-    public void processLoadQuestion(final int eventId, final int userid) {
+    public void processLoadQuestion(final int eventId, final int userid, boolean loading) {
+        Log.d("MYTAG2", "processLoadQuestion " + loading);
         if (firstLoad) {
             firstLoad = false;
         } else {
@@ -304,10 +326,13 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
         this.eventId = eventId;
         this.userId = userid;
         DateTimeUltis.setLastCheck(getRealContext());
-        mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
-        ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
-                .setText(getResources().getString(R.string.loading));
-        mRecyclerView.showEmptyView();
+
+        if (loading){
+            mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
+            ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
+                    .setText(getResources().getString(R.string.loading));
+            mRecyclerView.showEmptyView();
+        }
         ApiEndpoint api = ApiService.build();
         Call<Question> call = api.getAllQuestions(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Question>() {
@@ -316,6 +341,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                 Log.d("MYTAG", "EQF url: " + response.raw().request().url());
                 mRecyclerView.hideEmptyView();
                 if (response.body().getResults().size() == 0) {
+                    isAdapterEmpty = true;
                     mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.INVISIBLE);
                     ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
                             .setText(getResources().getString(R.string.no_question_tap_to_retry));
@@ -323,11 +349,12 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                         @Override
                         public void onClick(View v) {
                             firstLoad = true;
-                            processLoadQuestion(eventId, userid);
+                            processLoadQuestion(eventId, userid, true);
                         }
                     });
                     mRecyclerView.showEmptyView();
                 } else {
+                    isAdapterEmpty = false;
                     mModels = new ArrayList<>();
                     mModels.addAll(response.body().getResults());
                     mAdapter = new SimpleQuestionAdapter(response.body().getResults(), EventQuestionFragment.this);
@@ -346,7 +373,7 @@ public class EventQuestionFragment extends BaseFragment implements IOnAdapterInt
                     @Override
                     public void onClick(View v) {
                         firstLoad = true;
-                        processLoadQuestion(eventId, userid);
+                        processLoadQuestion(eventId, userid, true);
                     }
                 });
             }

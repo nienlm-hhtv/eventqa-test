@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.hhtv.eventqa.fragment.EventHighestVoteFragment;
 import com.hhtv.eventqa.helper.listener.IOnAdapterInteractListener;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.model.question.Result;
@@ -53,9 +54,21 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         return new ItemViewViewHolder(view, false);
     }
 
+    @Override
+    public int getItemCount() {
+        return mModel.size();
+    }
 
     @DebugLog
     public void insertNewItem(List<Result> results, IOnUpdateItemsComplete i) {
+        if (mModel.size() == 0){
+            for (Result result: results
+                 ) {
+                insert(mModel, result, 0);
+                notifyItemRangeChanged(0, mModel.size());
+            }
+            return;
+        }
         for (Result result : results) {
             int p = isItemInModel(result.getBody());
             if (p == -1) {
@@ -257,8 +270,10 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
                 if (pos != -1 && !mModel.get(pos).getIsVoted()){
                     holder.mVoteUpCount.setText((Integer.parseInt(holder.mVoteUpCount.getText().toString()) + 1) + "");
                     Log.d("MYTAG", "press vote at position: " + pos + ". item: " + mModel.get(pos).getBody());
-                    instantswitch(pos, mModel.get(pos).getvote_up_count() + 1);
-                    mFragment.processVote(mModel.get(pos), pos,  true);
+                    if (mFragment instanceof EventHighestVoteFragment){
+                        instantswitch(pos, mModel.get(pos).getvote_up_count() + 1);
+                    }
+                    mFragment.processVote(Integer.parseInt(holder.mId.getText().toString()), pos,  true);
                 }else{
                     mFragment.showToast("");
                 }
@@ -273,7 +288,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
 
                     holder.mVoteDownCount.setText((Integer.parseInt(holder.mVoteDownCount.getText().toString()) + 1) + "");
                     Log.d("MYTAG", "press vote at position: " + pos + ". item: " + mModel.get(pos).getBody());
-                    mFragment.processVote(mModel.get(pos), pos, false);
+                    mFragment.processVote(Integer.parseInt(holder.mId.getText().toString()), pos, false);
                 }else{
                     mFragment.showToast("");
                 }

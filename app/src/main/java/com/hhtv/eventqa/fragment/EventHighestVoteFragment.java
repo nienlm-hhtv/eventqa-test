@@ -172,20 +172,20 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         mAdapter.insert(mAdapter.getmModel(), result, mAdapter.getmModel().size());
     }*/
     @Override
-    public void processVote(final Result question, int pos, final boolean up) {
+    public void processVote(int id, int pos, final boolean up) {
         /*if (UserUltis.getUserId(getRealContext()) == -1) {
             Toast.makeText(getRealContext(), "Signin before vote !", Toast.LENGTH_SHORT).show();
             return;
         }*/
-        if (question.getIsVoted()){
+        /*if (question.getIsVoted()){
             return;
-        }
+        }*/
         mAdapter.getmModel().get(pos).setIsVoted(true);
-        final int questionId = question.getId();
+
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
         Log.d("MYTAG", "EHVF vote, call on: " + DateTime.now(DateTimeZone.UTC).toString("MM-dd-yyyy HH:mm:ss"));
-        Call<Vote> call = api.vote(eventId, questionId, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
+        Call<Vote> call = api.vote(eventId, id, UserUltis.getUserId(getRealContext()), up, DeviceUltis.getDeviceId(getRealContext()));
         call.enqueue(new Callback<Vote>() {
             @Override
             public void onResponse(Response<Vote> response, Retrofit retrofit) {

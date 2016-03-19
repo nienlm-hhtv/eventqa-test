@@ -189,8 +189,14 @@ public class MainActivity extends AppCompatActivity
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Log.d("MYTAG", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
-                reloadContent();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d("MYTAG", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
+                        reloadContent();
+                    }
+                });
+
             }
         }, TIMER_DELAY, TIMER_DELAY);
     }
