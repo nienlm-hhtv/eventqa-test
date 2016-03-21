@@ -24,7 +24,7 @@
         <activity android:name=".activity.MainActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".activity.UserSigninActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".activity.UserSignupActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".activity.QRScannerActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.NoTitleBar.Fullscreen"></activity>
+        <activity android:name=".activity.QRScannerActivity" android:screenOrientation="portrait" android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"></activity>
         <activity android:name=".activity.PostQuestionActivity" android:screenOrientation="portrait" android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize"></activity>
         <activity

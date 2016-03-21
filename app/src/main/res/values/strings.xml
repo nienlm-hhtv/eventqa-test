@@ -34,5 +34,6 @@
     <string name="error_tap_to_retry">Error, tap to retry !</string>
     <string name="no_question_tap_to_retry">No questions, tap to retry !</string>
     <string name="do_you_want_to_exit">Do you want to exit ?</string>
+    <string name="getting_event_information">Getting event information…</string>
     <string name="ev_not_found_or_wrong_qr">Network error or incorrect QR code, please try again !</string>
 </resources>

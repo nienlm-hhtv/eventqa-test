@@ -371,6 +371,8 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onClick(MaterialDialog dialog, DialogAction which) {
                             dialog.dismiss();
+                            Intent i = new Intent(MainActivity.this, HomeActivity.class);
+                            startActivity(i);
                             MainActivity.this.finish();
                             overridePendingTransition(R.anim.in_from_left, R.anim.out_to_right);
                         }

@@ -43,7 +43,7 @@ dependencies {
     compile 'joda-time:joda-time:2.3'
     compile 'com.marshalchen.ultimaterecyclerview:library:0.3.18'
     compile 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
-    compile ('eu.livotov.labs.android:CAMView:2.0.1@aar') {transitive=true}
+    /*compile ('eu.livotov.labs.android:CAMView:2.0.1@aar') {transitive=true}*/
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
     compile('com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE')
     compile 'com.nineoldandroids:library:2.4.0'
@@ -56,5 +56,6 @@ dependencies {
     }
     compile 'commons-codec:commons-codec:1.10'
     compile 'com.airbnb:deeplinkdispatch:1.5.0'
+    compile 'me.dm7.barcodescanner:zbar:1.8.4'
     apt 'com.airbnb:deeplinkdispatch-processor:1.5.0'
 }

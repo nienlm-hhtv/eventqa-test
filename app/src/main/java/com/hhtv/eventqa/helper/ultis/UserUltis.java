@@ -28,6 +28,7 @@ public class UserUltis {
         setUserId(mContext,-1);
         setUserName(mContext,"Guest");
         setUserEmail(mContext,"");
+        
     }
 
     public static String getUserName(Context mContext){

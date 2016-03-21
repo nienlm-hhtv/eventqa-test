@@ -1,10 +1,9 @@
 package com.hhtv.eventqa.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
-import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -13,106 +12,78 @@ import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.api.ApiEndpoint;
 import com.hhtv.eventqa.api.ApiService;
 import com.hhtv.eventqa.model.event.EventDetail;
-import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-import eu.livotov.labs.android.camview.ScannerLiveView;
+import me.dm7.barcodescanner.zbar.Result;
+import me.dm7.barcodescanner.zbar.ZBarScannerView;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
 import retrofit.Retrofit;
 
 /**
- * Created by nienb on 29/2/16.
+ * Created by nienb on 21/3/16.
  */
-public class QRScannerActivity extends FragmentActivity {
-
-    @Bind(R.id.qrscanner_camera)
-    ScannerLiveView mCamera;
-    @Bind(R.id.qrscanner_progressbar)
-    CircleProgressBar mLoading;
+public class QRScannerActivity extends Activity implements ZBarScannerView.ResultHandler {
+    private ZBarScannerView mScannerView;
     ApiEndpoint api;
+    MaterialDialog loadingDialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_qrscanner);
-
-        ButterKnife.bind(this);
-        mLoading.setVisibility(View.INVISIBLE);
+    public void onCreate(Bundle state) {
+        super.onCreate(state);
+        mScannerView = new ZBarScannerView(this);
+        setContentView(mScannerView);
+        loadingDialog = new MaterialDialog.Builder(this)
+                .title(R.string.please_wait)
+                .content(R.string.getting_event_information)
+                .theme(Theme.LIGHT)
+                .progress(true, 1)
+                .cancelable(false).build();
         api = ApiService.build();
-        mCamera.startScanner();
-        mCamera.setScannerViewEventListener(new ScannerLiveView.ScannerViewEventListener() {
-            @Override
-            public void onScannerStarted(ScannerLiveView scanner) {
-            }
+    }
 
-            @Override
-            public void onScannerStopped(ScannerLiveView scanner) {
+    @Override
+    public void onResume() {
+        super.onResume();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
+    }
 
-            }
+    @Override
+    public void onPause() {
+        super.onPause();
+        mScannerView.stopCamera();
+    }
 
-            @Override
-            public void onScannerError(Throwable err) {
-
-            }
-
-            @Override
-            public void onCodeScanned(String data) {
-                Log.d("MYTAG", "data scanned: " + data);
-                mLoading.setVisibility(View.VISIBLE);
-                Call<EventDetail> call = api.getEventDetail(data);
-                call.enqueue(new Callback<EventDetail>() {
-                    @Override
-                    public void onResponse(final Response<EventDetail> response, Retrofit retrofit) {
-                        mLoading.setVisibility(View.INVISIBLE);
-                        if (response.body().getSuccess()) {
-                            mCamera.stopScanner();
-                            gotoEventDetail(response.body());
-                        } else {
-                            mCamera.stopScanner();
-                            new MaterialDialog
-                                    .Builder(QRScannerActivity.this)
-                                    .title(R.string.event_not_found)
-                                    .content(response.body().getMessage())
-                                    .negativeText(R.string.exit)
-                                    .theme(Theme.LIGHT)
-                                    .positiveText(R.string.rescan)
-                                    .onNegative(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(MaterialDialog dialog, DialogAction which) {
-                                            mCamera.stopScanner();
-                                            dialog.dismiss();
-                                            QRScannerActivity.this.finish();
-                                        }
-                                    })
-                                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                        @Override
-                                        public void onClick(MaterialDialog dialog, DialogAction which) {
-                                            dialog.dismiss();
-                                            mCamera.startScanner();
-                                        }
-                                    }).show();
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Throwable t) {
-                        Log.d("MYTAG", "QR code retrofit error: " + t.getMessage());
-                        mLoading.setVisibility(View.INVISIBLE);
-                        mCamera.stopScanner();
+    @Override
+    public void handleResult(Result rawResult) {
+        // Do something with the result here
+        Log.v("MYTAG2", rawResult.getContents());
+        Log.v("MYTAG2", rawResult.getBarcodeFormat().getName());
+        //mScannerView.stopCamera();
+        if (rawResult.getBarcodeFormat().getName().equals("QRCODE")) {
+            loadingDialog.show();
+            Call<EventDetail> call = api.getEventDetail(rawResult.getContents());
+            call.enqueue(new Callback<EventDetail>() {
+                @Override
+                public void onResponse(final Response<EventDetail> response, Retrofit retrofit) {
+                    loadingDialog.dismiss();
+                    if (response.body().getSuccess()) {
+                        mScannerView.stopCamera();
+                        gotoEventDetail(response.body());
+                    } else {
+                        mScannerView.stopCamera();
                         new MaterialDialog
                                 .Builder(QRScannerActivity.this)
                                 .title(R.string.event_not_found)
-                                .content(R.string.ev_not_found_or_wrong_qr)
+                                .content(response.body().getMessage())
                                 .negativeText(R.string.exit)
                                 .theme(Theme.LIGHT)
                                 .positiveText(R.string.rescan)
                                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(MaterialDialog dialog, DialogAction which) {
-                                        mCamera.stopScanner();
+                                        mScannerView.stopCamera();
                                         dialog.dismiss();
                                         QRScannerActivity.this.finish();
                                     }
@@ -121,14 +92,45 @@ public class QRScannerActivity extends FragmentActivity {
                                     @Override
                                     public void onClick(MaterialDialog dialog, DialogAction which) {
                                         dialog.dismiss();
-                                        mCamera.startScanner();
+                                        mScannerView.resumeCameraPreview(QRScannerActivity.this);
                                     }
                                 }).show();
-
                     }
-                });
-            }
-        });
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    Log.d("MYTAG2", "QR code retrofit error: " + t.getMessage());
+                    loadingDialog.dismiss();
+                    mScannerView.stopCamera();
+                    new MaterialDialog
+                            .Builder(QRScannerActivity.this)
+                            .title(R.string.event_not_found)
+                            .content(R.string.ev_not_found_or_wrong_qr)
+                            .negativeText(R.string.exit)
+                            .theme(Theme.LIGHT)
+                            .positiveText(R.string.rescan)
+                            .onNegative(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(MaterialDialog dialog, DialogAction which) {
+                                    mScannerView.stopCamera();
+                                    dialog.dismiss();
+                                    QRScannerActivity.this.finish();
+                                }
+                            })
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
+                                @Override
+                                public void onClick(MaterialDialog dialog, DialogAction which) {
+                                    dialog.dismiss();
+                                    mScannerView.startCamera();
+                                }
+                            }).show();
+
+                }
+            });
+        } else {
+            mScannerView.resumeCameraPreview(this);
+        }
     }
 
     @Override
@@ -144,11 +146,5 @@ public class QRScannerActivity extends FragmentActivity {
         i.putExtra("curEvent", eventDetail);
         startActivity(i);
         this.finish();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        mCamera.stopScanner();
     }
 }
