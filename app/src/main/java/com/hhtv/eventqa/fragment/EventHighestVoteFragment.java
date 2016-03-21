@@ -87,8 +87,9 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
             @Override
             public void onRefresh() {
                 firstLoad = true;
-                mRecyclerView.setRefreshing(true);
-                processLoadQuestion(eventId, userId, false);
+                //mRecyclerView.setRefreshing(true);
+                //processLoadQuestion(eventId, userId, false);
+                ((MainActivity)getActivity()).reloadContent(false);
             }
         });
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -180,7 +181,11 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         /*if (question.getIsVoted()){
             return;
         }*/
-        mAdapter.getmModel().get(pos).setIsVoted(true);
+        try{
+            mAdapter.getmModel().get(pos).setIsVoted(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         mRecyclerView.setRefreshing(true);
         ApiEndpoint api = ApiService.build();
@@ -198,7 +203,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                     mRecyclerView.setAdapter(mAdapter);
                 }
                 //processLoadQuestion(eventId, userId, false);
-                ((MainActivity)getRealContext()).reloadContent();
+                ((MainActivity)getRealContext()).reloadContent(true);
             }
 
             @Override
@@ -231,10 +236,11 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
         this.eventId = eventId;
         this.userId = userid;
         if (loading) {
-            mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
+            mRecyclerView.setRefreshing(true);
+            /*mRecyclerView.getEmptyView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
             ((TextView) mRecyclerView.getEmptyView().findViewById(R.id.textView2))
                     .setText(getResources().getString(R.string.loading));
-            mRecyclerView.showEmptyView();
+            mRecyclerView.showEmptyView();*/
         }
         ApiEndpoint api = ApiService.build();
         Call<Question> call = api.getHighestVoteQuestion(eventId, userid, DeviceUltis.getDeviceId(getRealContext()));
@@ -266,7 +272,7 @@ public class EventHighestVoteFragment extends BaseFragment implements IOnAdapter
                         mRecyclerView.setAdapter(mAdapter);
                     }
                     List<List<Result>> list = reArrangeModels(response.body().getResults());
-                    updateData(list);
+                    Log.d("TIMER", "EHVQF: " + updateData(list));
                     mRecyclerView.hideEmptyView();
                 }
             }

@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -129,12 +130,12 @@ public class MainActivity extends AppCompatActivity
             @Override
             @DebugLog
             public void onClick(View v) {
-                mSheetLayout.expandFab();
-                /*if (UserUltis.getUserId(MainActivity.this) != -1) {
 
+                if (UserUltis.getUserId(MainActivity.this) != -1) {
+                    mSheetLayout.expandFab();
                 } else {
                     Toast.makeText(MainActivity.this, "Login to post new question !", Toast.LENGTH_SHORT).show();
-                }*/
+                }
             }
         });
         mSheetLayout.setFab(mFab);
@@ -192,8 +193,8 @@ public class MainActivity extends AppCompatActivity
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("MYTAG", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
-                        reloadContent();
+                        Log.d("TIMER", "timer excecute at: " + DateTime.now().toString("hh:mm:ss"));
+                        reloadContent(false);
                     }
                 });
 
@@ -273,14 +274,14 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(intent, POSTQUESTIONREQCODE);
     }
 
-    public void reloadContent(){
+    public void reloadContent(boolean EVQFLoading){
         EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter) mPager.getAdapter())
                 .getItem(0);
         hf.processLoadQuestion(mModel.getId(),
-                UserUltis.getUserId(this), false);
+                UserUltis.getUserId(this), EVQFLoading);
         EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
                 .getItem(1);
-        f.processUpdateQuestion();
+        f.processUpdateQuestion(EVQFLoading);
         EventDetailFragment ed = (EventDetailFragment) ((ViewPagerAdapter)mPager.getAdapter())
                 .getItem(2);
         ed.updateEventDetail();
@@ -295,13 +296,13 @@ public class MainActivity extends AppCompatActivity
                 mSheetLayout.contractFab();
                 boolean isPost = data.getBooleanExtra("post",false);
                 if (isPost){
-                    EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
-                            .getItem(1);
-                    f.instantInsert(data.getStringExtra("body"));
+                    /*EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                            .getItem(1);*/
+                    //f.instantInsert(data.getStringExtra("body"));
                     /*EventQuestionFragment f2 = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
                             .getItem(0);
                     f2.instantInsert(data.getStringExtra("body"));*/
-                    reloadContent();
+                    reloadContent(true);
                 }
                 break;
             case SIGNINREQCODE:
@@ -408,9 +409,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_setting) {
+       /* if (id == R.id.nav_setting) {
 
-        } else if (id == R.id.nav_signout) {
+        } else */if (id == R.id.nav_signout) {
             new MaterialDialog.Builder(MainActivity.this)
                     .title(R.string.confirm_signout)
                     .content(R.string.would_you_like_to_sign_out)

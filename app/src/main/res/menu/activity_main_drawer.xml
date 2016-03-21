@@ -22,10 +22,10 @@
 
     <item android:title="Your account">
         <menu>
-            <item
+            <!--<item
                 android:id="@+id/nav_setting"
                 android:icon="@drawable/ic_action_settings"
-                android:title="Setting" />
+                android:title="Setting" />-->
             <item
                 android:id="@+id/nav_signout"
                 android:icon="@drawable/ic_action_exit"

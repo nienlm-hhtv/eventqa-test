@@ -63,16 +63,22 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     public void insertNewItem(List<Result> results, IOnUpdateItemsComplete i) {
         if (mModel.size() == 0){
             for (Result result: results
-                 ) {
-                insert(mModel, result, 0);
+                    ) {
+                mModel.add(0, result);
+                notifyItemInserted(0);
                 notifyItemRangeChanged(0, mModel.size());
+                //insert(mModel, result, 0);
+                /*notifyItemRangeInserted(0, mModel.size());*/
+                /*notifyItemRangeChanged(0, mModel.size());*/
             }
             return;
         }
         for (Result result : results) {
             int p = isItemInModel(result.getBody());
             if (p == -1) {
-                insert(mModel, result, 0);
+                mModel.add(0, result);
+                notifyItemInserted(0);
+                notifyItemRangeChanged(0, mModel.size());
                 Log.d("MYTAG", "insert item: " + result.getBody() + ". Size: " + mModel.size()
                         + " item: " + mModel.get(0).getBody());
                 notifyItemRangeChanged(0, mModel.size());
@@ -83,10 +89,15 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         i.onComplete();
     }
 
+
+
     @DebugLog
     public void insertNewItemOnBottom(List<Result> results, IOnUpdateItemsComplete i) {
         for (Result result : results) {
-            insert(mModel, result, mModel.size());
+            mModel.add(mModel.size(), result);
+            notifyItemInserted(mModel.size());
+            notifyItemRangeChanged(0, mModel.size());
+            /*insert(mModel, result, mModel.size());*/
         }
         i.onComplete();
     }
@@ -96,7 +107,9 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         for (Result result : results) {
             int p = isItemInModel(result.getId());
             if (p != -1) {
-                remove(mModel, p);
+                mModel.remove(p);
+                notifyItemRemoved(p);
+                notifyItemRangeChanged(p, mModel.size());
             }
         }
         i.onComplete();
@@ -166,9 +179,12 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
     @DebugLog
     public void removeItems(List<Result> results) {
         for (Result result : results) {
-            int p = isItemInModel(result.getId());
+            int p = isItemInModel(result.getBody());
             if (p != -1) {
-                remove(mModel, p);
+                /* remove(mModel, p); */
+                mModel.remove(p);
+                notifyItemRemoved(p);
+                notifyItemRangeChanged(p, mModel.size());
             }
         }
     }
@@ -199,6 +215,7 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         r.setIsVoted(item.getIsVoted());
         p = mModel.indexOf(r);
         notifyItemChanged(p);
+
     }
 
 
