@@ -30,8 +30,8 @@ import com.afollestad.materialdialogs.Theme;
 import com.github.fabtransitionactivity.SheetLayout;
 import com.hhtv.eventqa.R;
 import com.hhtv.eventqa.fragment.EventDetailFragment;
-import com.hhtv.eventqa.fragment.EventHighestVoteFragment;
-import com.hhtv.eventqa.fragment.EventQuestionFragment;
+import com.hhtv.eventqa.fragment.EventHighestVoteFragment2;
+import com.hhtv.eventqa.fragment.EventQuestionFragment2;
 import com.hhtv.eventqa.helper.ultis.UserUltis;
 import com.hhtv.eventqa.model.event.EventDetail;
 
@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     Timer mTimer;
-    final int TIMER_DELAY = 10 * 1000;
+    final int TIMER_DELAY = 7 * 1000;
 
     public void initTimer() {
         mTimer = new Timer();
@@ -211,10 +211,10 @@ public class MainActivity extends AppCompatActivity
 
     private void setupViewPager(ViewPager viewPager) {
         final ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(EventHighestVoteFragment.newInstance(mModel.getId(), UserUltis.getUserId(
+        adapter.addFragment(EventHighestVoteFragment2.newInstance(mModel.getId(), UserUltis.getUserId(
                 MainActivity.this
         )), "ONE");
-        adapter.addFragment(EventQuestionFragment.newInstance(mModel.getId(), UserUltis.getUserId(
+        adapter.addFragment(EventQuestionFragment2.newInstance(mModel.getId(), UserUltis.getUserId(
                 MainActivity.this
         )), "TWO");
         adapter.addFragment(EventDetailFragment.newInstance(mModel), "THREE");
@@ -275,11 +275,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void reloadContent(boolean EVQFLoading){
-        EventHighestVoteFragment hf = (EventHighestVoteFragment) ((ViewPagerAdapter) mPager.getAdapter())
+        EventHighestVoteFragment2 hf = (EventHighestVoteFragment2) ((ViewPagerAdapter) mPager.getAdapter())
                 .getItem(0);
         hf.processLoadQuestion(mModel.getId(),
                 UserUltis.getUserId(this), EVQFLoading);
-        EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+        EventQuestionFragment2 f = (EventQuestionFragment2) ((ViewPagerAdapter) mPager.getAdapter())
                 .getItem(1);
         f.processUpdateQuestion(EVQFLoading);
         EventDetailFragment ed = (EventDetailFragment) ((ViewPagerAdapter)mPager.getAdapter())
@@ -296,10 +296,10 @@ public class MainActivity extends AppCompatActivity
                 mSheetLayout.contractFab();
                 boolean isPost = data.getBooleanExtra("post",false);
                 if (isPost){
-                    /*EventQuestionFragment f = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                    /*EventQuestionFragment2 f = (EventQuestionFragment2) ((ViewPagerAdapter) mPager.getAdapter())
                             .getItem(1);*/
                     //f.instantInsert(data.getStringExtra("body"));
-                    /*EventQuestionFragment f2 = (EventQuestionFragment) ((ViewPagerAdapter) mPager.getAdapter())
+                    /*EventQuestionFragment2 f2 = (EventQuestionFragment2) ((ViewPagerAdapter) mPager.getAdapter())
                             .getItem(0);
                     f2.instantInsert(data.getStringExtra("body"));*/
                     reloadContent(true);
@@ -307,7 +307,16 @@ public class MainActivity extends AppCompatActivity
                 break;
             case SIGNINREQCODE:
                 setupNavigationView();
-
+                EventHighestVoteFragment2 hf = (EventHighestVoteFragment2) ((ViewPagerAdapter) mPager.getAdapter())
+                        .getItem(0);
+                hf.processReLoadAllQuestion(mModel.getId(),
+                        UserUltis.getUserId(MainActivity.this));
+                EventQuestionFragment2 f = (EventQuestionFragment2) ((ViewPagerAdapter) mPager.getAdapter())
+                        .getItem(1);
+                f.processLoadQuestion(mModel.getId(), UserUltis.getUserId(MainActivity.this), true);
+                EventDetailFragment ed = (EventDetailFragment) ((ViewPagerAdapter)mPager.getAdapter())
+                        .getItem(2);
+                ed.updateEventDetail();
                 break;
             default:
                 break;
@@ -423,6 +432,16 @@ public class MainActivity extends AppCompatActivity
                             dialog.dismiss();
                             UserUltis.logout(MainActivity.this);
                             setupNavigationView();
+                            EventHighestVoteFragment2 hf = (EventHighestVoteFragment2) ((ViewPagerAdapter) mPager.getAdapter())
+                                    .getItem(0);
+                            hf.processReLoadAllQuestion(mModel.getId(),
+                                    UserUltis.getUserId(MainActivity.this));
+                            EventQuestionFragment2 f = (EventQuestionFragment2) ((ViewPagerAdapter) mPager.getAdapter())
+                                    .getItem(1);
+                            f.processLoadQuestion(mModel.getId(), UserUltis.getUserId(MainActivity.this), true);
+                            EventDetailFragment ed = (EventDetailFragment) ((ViewPagerAdapter)mPager.getAdapter())
+                                    .getItem(2);
+                            ed.updateEventDetail();
                         }
                     }).show();
         } else if (id == R.id.nav_signin) {

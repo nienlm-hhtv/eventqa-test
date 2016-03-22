@@ -1,3 +1,4 @@
+/*
 package com.hhtv.eventqa.adapter;
 
 import android.graphics.Color;
@@ -27,9 +28,11 @@ import java.util.TimeZone;
 
 import hugo.weaving.DebugLog;
 
+*/
 /**
  * Created by nienb on 1/3/16.
- */
+ *//*
+
 public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAdapter.ItemViewViewHolder> {
     private List<Result> mModel;
     private static final PrettyTime PT = new PrettyTime();
@@ -68,8 +71,12 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
                 notifyItemInserted(0);
                 notifyItemRangeChanged(0, mModel.size());
                 //insert(mModel, result, 0);
-                /*notifyItemRangeInserted(0, mModel.size());*/
-                /*notifyItemRangeChanged(0, mModel.size());*/
+                */
+/*notifyItemRangeInserted(0, mModel.size());*//*
+
+                */
+/*notifyItemRangeChanged(0, mModel.size());*//*
+
             }
             return;
         }
@@ -97,7 +104,9 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
             mModel.add(mModel.size(), result);
             notifyItemInserted(mModel.size());
             notifyItemRangeChanged(0, mModel.size());
-            /*insert(mModel, result, mModel.size());*/
+            */
+/*insert(mModel, result, mModel.size());*//*
+
         }
         i.onComplete();
     }
@@ -181,7 +190,9 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         for (Result result : results) {
             int p = isItemInModel(result.getBody());
             if (p != -1) {
-                /* remove(mModel, p); */
+                */
+/* remove(mModel, p); *//*
+
                 mModel.remove(p);
                 notifyItemRemoved(p);
                 notifyItemRangeChanged(p, mModel.size());
@@ -364,3 +375,4 @@ public class SimpleQuestionAdapter extends UltimateViewAdapter<SimpleQuestionAda
         }
     }
 }
+*/
